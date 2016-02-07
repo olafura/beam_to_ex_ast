@@ -81,11 +81,11 @@ defmodule BeamToExAst do
         to_string(str)
     end
 
-    def convert_param({:integer, ln, i1}) do
+    def convert_param({:integer, _ln, i1}) do
         i1
     end
 
-    def convert_param({:float, ln, f1}) do
+    def convert_param({:float, _ln, f1}) do
         f1
     end
 
