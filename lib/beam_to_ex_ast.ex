@@ -40,7 +40,7 @@ defmodule BeamToExAst do
     def def_body(items) do
         case length(items) do
             1 -> [do: def_body_item(List.first(items))]
-            _ -> [do: {:__block__, [], Elem.map(items, &def_body_item/1)}]
+            _ -> [do: {:__block__, [], Enum.map(items, &def_body_item/1)}]
         end
     end
 
