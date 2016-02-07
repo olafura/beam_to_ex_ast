@@ -7,7 +7,7 @@ defmodule BeamToExAst do
              [do: List.first(rest)]]}
             _ -> {:defmodule, [line: 1],
             [{:__aliases__, [counter: 0, line: 1], [mod_name]},
-             [do: {:__block__, [], rest}]]}
+             [do: {:__block__, [], Enum.reverse(rest)}]]}
             
         end
     end
@@ -28,10 +28,15 @@ defmodule BeamToExAst do
 
     def do_convert({:function, ln, name, _n, body}, {mod_name, rest}) do
         case body do
-            [{:clause, ln2, _params, _guard, def_body}] ->
+            [{:clause, ln2, params, _guard, def_body}] ->
                 {mod_name, [{:def,
                              [line: ln],
-                             [{name, [line: ln2], []}, def_body(def_body)]
+                             [{name,
+                               [line: ln2],
+                               convert_params(params)
+                              },
+                              def_body(def_body)
+                             ]
                             } | rest]}
             _ -> IO.error(body)
         end
@@ -65,7 +70,7 @@ defmodule BeamToExAst do
     end
 
     def convert_param({:var, ln, var}) do
-        {var, [line: ln], nil}
+        {clean_var(var), [line: ln], nil}
     end
 
     def convert_param({:bin, _ln, elements}) do
@@ -79,5 +84,10 @@ defmodule BeamToExAst do
     def clean_atom(a1) do
         s1 = Atom.to_string(a1)
         String.to_atom(String.replace(s1, "Elixir.", ""))
+    end
+
+    def clean_var(v1) do
+        s1 = Atom.to_string(v1)
+        String.to_atom(String.replace(s1, ~r/@\d+/, ""))
     end
 end
