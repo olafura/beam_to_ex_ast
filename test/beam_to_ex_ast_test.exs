@@ -68,4 +68,13 @@ defmodule BeamToExAstTest do
     assert BeamToExAst.convert(mod_beam) == mod_ast
   end
 
+  test "test float" do
+    file = "lib/test_files/function_float.ex"
+    file_content = File.read!(file)
+    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionFloat.beam'
+    {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
+        :beam_lib.chunks(beam_file, [:abstract_code])
+    {:ok, mod_ast} = Code.string_to_quoted(file_content)
+    assert BeamToExAst.convert(mod_beam) == mod_ast
+  end
 end
