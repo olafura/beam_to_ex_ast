@@ -40,7 +40,7 @@ defmodule BeamToExAstTest do
     assert BeamToExAst.convert(mod_beam) == mod_ast
   end
 
-  test "test module function boyd" do
+  test "test module function body" do
     file = "lib/test_files/function_body.ex"
     file_content = File.read!(file)
     beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionBody.beam'
