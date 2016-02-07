@@ -35,8 +35,6 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
         :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    #IO.inspect mod_beam
-    #IO.inspect mod_ast
     assert BeamToExAst.convert(mod_beam) == mod_ast
   end
 
@@ -47,8 +45,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
         :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    #IO.inspect mod_beam
-    #IO.inspect mod_ast
     assert BeamToExAst.convert(mod_beam) == mod_ast
   end
+
 end
