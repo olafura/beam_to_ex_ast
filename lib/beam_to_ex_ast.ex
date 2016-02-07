@@ -81,6 +81,10 @@ defmodule BeamToExAst do
         to_string(str)
     end
 
+    def convert_param({:integer, ln, i1}) do
+        i1
+    end
+
     def clean_atom(a1) do
         s1 = Atom.to_string(a1)
         String.to_atom(String.replace(s1, "Elixir.", ""))
