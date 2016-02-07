@@ -7,7 +7,7 @@ defmodule BeamToExAst do
              [do: List.first(rest)]]}
             _ -> {:defmodule, [line: 1],
             [{:__aliases__, [counter: 0, line: 1], [mod_name]},
-             [do: {:__block__, [], Enum.inverse(rest)}]]}
+             [do: {:__block__, [], Enum.reverse(rest)}]]}
             
         end
     end
@@ -56,7 +56,7 @@ defmodule BeamToExAst do
           clean_atom(caller)]}, [line: ln], convert_params(params)}
     end
 
-    def caller({:atom, ln, caller}, params) do
+    def def_caller({:atom, ln, caller}, params) do
         {caller, [line: ln], convert_params(params)}
     end
 
