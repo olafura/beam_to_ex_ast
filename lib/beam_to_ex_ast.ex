@@ -44,25 +44,29 @@ defmodule BeamToExAst do
 
     def def_body(items) do
         case length(items) do
-            1 -> [do: def_body_item(List.first(items))]
-            _ -> [do: {:__block__, [], Enum.map(items, &def_body_item/1)}]
+            1 -> [do: convert_param(List.first(items))]
+            _ -> [do: {:__block__, [], Enum.map(items, &convert_param/1)}]
         end
     end
 
-    def def_body_item({:call, _ln, caller, params}) do
+    def convert_param({:call, _ln, caller, params}) do
         def_caller(caller, params)
     end
 
-    def def_body_item({:match, ln, m1, m2}) do
+    def convert_param({:match, ln, m1, m2}) do
         {:=, [line: ln], [convert_param(m1), convert_param(m2)]}
     end
 
     def def_caller({:remote, ln,{:atom, _, mod_call},
                     {:atom, _, caller}}, params) do
-        {{:., [line: ln],
-          [{:__aliases__, [counter: 0, line: ln],
-            [clean_atom(mod_call)]},
-          clean_atom(caller)]}, [line: ln], convert_params(params)}
+        case clean_atom(mod_call) do
+            :Kernel -> {caller, [line: ln],  convert_params(params)}
+            c_mod_call -> {{:., [line: ln],
+                            [{:__aliases__, [counter: 0, line: ln],
+                              [c_mod_call]},
+                             clean_atom(caller)]},
+                           [line: ln], convert_params(params)}
+        end
     end
 
     def def_caller({:atom, ln, caller}, params) do
@@ -114,11 +118,23 @@ defmodule BeamToExAst do
     end
 
     def convert_param({:op, ln, op1, p1, p2}) do
-        {op1, [line: ln], [convert_param(p1), convert_param(p2)]}
+        {clean_op(op1), [line: ln], [convert_param(p1), convert_param(p2)]}
     end
 
     def convert_param({nil, _ln}) do
         []
+    end
+
+    def clean_op(op1) do
+        s1 = Atom.to_string(op1)
+        case s1 do
+            "=:=" -> "==="
+            "=/=" -> "!=="
+            "/=" -> "!="
+            "=<" -> "<="
+            _ -> s1
+        end
+        |> String.to_atom
     end
 
     def clean_atom(a1) do
