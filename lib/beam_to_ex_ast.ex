@@ -53,6 +53,10 @@ defmodule BeamToExAst do
         def_caller(caller, params)
     end
 
+    def def_body_item({:match, ln, m1, m2}) do
+        {:=, [line: ln], [convert_param(m1), convert_param(m2)]}
+    end
+
     def def_caller({:remote, ln,{:atom, _, mod_call},
                     {:atom, _, caller}}, params) do
         {{:., [line: ln],
@@ -107,6 +111,10 @@ defmodule BeamToExAst do
 
     def convert_param({:map_field_assoc, _ln, key, val}) do
         {convert_param(key), convert_param(val)}
+    end
+
+    def convert_param({:op, ln, op1, p1, p2}) do
+        {op1, [line: ln], [convert_param(p1), convert_param(p2)]}
     end
 
     def convert_param({nil, _ln}) do
