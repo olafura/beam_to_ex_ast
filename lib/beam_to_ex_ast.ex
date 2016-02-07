@@ -97,6 +97,10 @@ defmodule BeamToExAst do
        [convert_param(c1) | convert_param(c2)]
     end
 
+    def convert_param({:tuple, ln, items}) do
+       {:{}, [line: ln], Enum.map(items, &convert_param/1)}
+    end
+
     def convert_param({nil, _ln}) do
         []
     end
