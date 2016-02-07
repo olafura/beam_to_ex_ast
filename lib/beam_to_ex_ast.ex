@@ -7,7 +7,7 @@ defmodule BeamToExAst do
              [do: List.first(rest)]]}
             _ -> {:defmodule, [line: 1],
             [{:__aliases__, [counter: 0, line: 1], [mod_name]},
-             [do: {:__block__, [], Enum.reverse(rest)}]]}
+             [do: {:__block__, [], rest}]]}
             
         end
     end
