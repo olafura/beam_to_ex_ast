@@ -7,7 +7,7 @@ defmodule BeamToExAst do
              [do: List.first(rest)]]}
             _ -> {:defmodule, [line: 1],
             [{:__aliases__, [counter: 0, line: 1], [mod_name]},
-             [do: {:__block__, [], Enum.reverse(rest)}]]}
+             [do: {:__block__, [], rest}]]}
             
         end
     end
@@ -49,14 +49,6 @@ defmodule BeamToExAst do
         end
     end
 
-    def convert_param({:call, _ln, caller, params}) do
-        def_caller(caller, params)
-    end
-
-    def convert_param({:match, ln, m1, m2}) do
-        {:=, [line: ln], [convert_param(m1), convert_param(m2)]}
-    end
-
     def def_caller({:remote, ln,{:atom, _, mod_call},
                     {:atom, _, caller}}, params) do
         case clean_atom(mod_call) do
@@ -77,16 +69,20 @@ defmodule BeamToExAst do
         Enum.map(params, &convert_param/1)
     end
 
+    def convert_param({:call, _ln, caller, params}) do
+        def_caller(caller, params)
+    end
+
+    def convert_param({:match, ln, m1, m2}) do
+        {:=, [line: ln], [convert_param(m1), convert_param(m2)]}
+    end
+
     def convert_param({:var, ln, var}) do
         {clean_var(var), [line: ln], nil}
     end
 
     def convert_param({:bin, _ln, elements}) do
         convert_bin(List.first(elements))
-    end
-
-    def convert_bin({:bin_element, ln, {:string, ln, str}, _, _}) do
-        to_string(str)
     end
 
     def convert_param({:integer, _ln, i1}) do
@@ -123,6 +119,10 @@ defmodule BeamToExAst do
 
     def convert_param({nil, _ln}) do
         []
+    end
+
+    def convert_bin({:bin_element, ln, {:string, ln, str}, _, _}) do
+        to_string(str)
     end
 
     def clean_op(op1) do
