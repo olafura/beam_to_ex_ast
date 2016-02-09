@@ -15,7 +15,7 @@ defmodule BeamToExAst do
     #_n is number of parameters
     #ln is the line number
     def do_convert({:attribute, _ln, :module, name}, {_, rest}) do
-        {clean_atom(name), rest}
+        {clean_module(name), rest}
     end
 
     def do_convert({:attribute, _, _, _}, acc) do
@@ -42,6 +42,10 @@ defmodule BeamToExAst do
         end
     end
 
+    def do_convert({:eof, _ln}, acc) do
+        acc
+    end
+
     def def_body(items) do
         case length(items) do
             1 -> [do: convert_param(List.first(items))]
@@ -49,15 +53,24 @@ defmodule BeamToExAst do
         end
     end
 
-    def def_caller({:remote, ln,{:atom, _, mod_call},
-                    {:atom, _, caller}}, params) do
-        case clean_atom(mod_call) do
-            :Kernel -> {caller, [line: ln],  convert_params(params)}
-            c_mod_call -> {{:., [line: ln],
+    def get_caller(c_mod_call, ln, caller, params) do
+        case String.match?(c_mod_call, ~r/^[A-Z]/) do
+            true -> {{:., [line: ln],
                             [{:__aliases__, [counter: 0, line: ln],
-                              [c_mod_call]},
+                              [String.to_atom(c_mod_call)]},
                              clean_atom(caller)]},
                            [line: ln], convert_params(params)}
+            false -> {{:., [line: ln],
+                            [String.to_atom(c_mod_call), clean_atom(caller)]},
+                           [line: ln], convert_params(params)}
+        end
+    end
+
+    def def_caller({:remote, ln,{:atom, _, mod_call},
+                    {:atom, _, caller}}, params) do
+        case half_clean_atom(mod_call) do
+            "Kernel" -> {caller, [line: ln],  convert_params(params)}
+            c_mod_call -> get_caller(c_mod_call, ln, caller, params)
         end
     end
 
@@ -137,9 +150,24 @@ defmodule BeamToExAst do
         |> String.to_atom
     end
 
+    def clean_module(a1) do
+        s1 = Atom.to_string(a1)
+        s1 = String.replace(s1, "Elixir.", "")
+        s1 = case String.match?(s1, ~r/^[A-Z]/) do
+            true -> s1
+            false -> Macro.camelize(s1)
+        end
+        String.to_atom(s1)
+    end
+
     def clean_atom(a1) do
         s1 = Atom.to_string(a1)
         String.to_atom(String.replace(s1, "Elixir.", ""))
+    end
+
+    def half_clean_atom(a1) do
+        s1 = Atom.to_string(a1)
+        String.replace(s1, "Elixir.", "")
     end
 
     def clean_var(v1) do
