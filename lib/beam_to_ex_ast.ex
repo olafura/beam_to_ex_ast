@@ -98,6 +98,10 @@ defmodule BeamToExAst do
         convert_bin(List.first(elements))
     end
 
+    def convert_param({:string, _ln, s1}) do
+        s1
+    end
+
     def convert_param({:integer, _ln, i1}) do
         i1
     end
