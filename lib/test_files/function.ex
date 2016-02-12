@@ -1,6 +1,7 @@
 defmodule TestFunction do
     def hello() do
-        IO.puts("Hello world")
+        prufa = fn() -> IO.puts("Hello world") end
+        prufa.()
     end
 end
 
