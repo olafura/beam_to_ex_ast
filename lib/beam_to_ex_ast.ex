@@ -15,8 +15,8 @@ defmodule BeamToExAst do
     lna < lnb
   end
 
-  #_n is number of parameters
-  #ln is the line number
+  # _n is number of parameters
+  # ln is the line number
   def do_convert({:attribute, _ln, :module, name}, {_, rest}) do
    {clean_module(name), rest}
   end
@@ -381,14 +381,15 @@ defmodule BeamToExAst do
   end
 
   def clean_op(op1) do
-    s1 = Atom.to_string(op1)
-    case s1 do
+    op1
+    |> Atom.to_string
+    |> case do
       "=:=" -> "==="
       "=/=" -> "!=="
       "/=" -> "!="
       "=<" -> "<="
       "andalso" -> "and"
-      _ -> s1
+      s1 -> s1
     end
     |> String.to_atom
   end

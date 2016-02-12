@@ -29,10 +29,12 @@ defmodule BeamToExAstTest do
   end
 
   # The atom can't get the line number
-  def clean_ast([__struct__: {:__aliases__, [counter: 0, line: _ln], [:Regex]}, opts: p1, re_pattern: p2, source: p3]) do
-    [__struct__: {:__aliases__, [counter: 0, line: 0], [:Regex]}, opts: p1, re_pattern: p2, source: p3]
+  def clean_ast([__struct__: {:__aliases__, [counter: 0, line: _ln],
+                 [:Regex]}, opts: p1, re_pattern: p2, source: p3]) do
+    [__struct__: {:__aliases__, [counter: 0, line: 0], [:Regex]},
+     opts: p1, re_pattern: p2, source: p3]
   end
-  
+
   def clean_ast(l1) when is_list(l1) do
     Enum.map(l1, &clean_ast/1)
   end
@@ -94,7 +96,8 @@ defmodule BeamToExAstTest do
     end
   end
 
-  def find_diff({a, line, [h1|t1] = l1}, {a, line, [h2|t2] = l2}) when is_list(l1) and is_list(l2) do
+  def find_diff({a, line, [h1|t1] = l1}, {a, line, [h2|t2] = l2})
+                when is_list(l1) and is_list(l2) do
     unless l1 == l2 do
       IO.inspect("match5")
       IO.inspect(l1)
@@ -113,10 +116,12 @@ defmodule BeamToExAstTest do
     IO.inspect(i2)
   end
 
+  @builddir '_build/test/lib/beam_to_ex_ast/ebin/'
+
   test "function" do
     fun_beam = {:function, 2, :hello, 0,
       [{:clause, 2, [], [],
-        [{:call, 3, {:remote, 3, {:atom, 0, IO}, {:atom, 3, :puts}}, 
+        [{:call, 3, {:remote, 3, {:atom, 0, IO}, {:atom, 3, :puts}},
           [{:bin, 0,[
             {:bin_element,
              0,
@@ -128,7 +133,7 @@ defmodule BeamToExAstTest do
       }]
     }
     fun_ast = {:def, [line: 2], [
-      {:hello, [line: 2], []}, 
+      {:hello, [line: 2], []},
       [do: {{:.,
              [line: 3],
              [{:__aliases__, [counter: 0, line: 3], [:IO]}, :puts]},
@@ -142,7 +147,7 @@ defmodule BeamToExAstTest do
   test "module" do
     file = "lib/test_files/function.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunction.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunction.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -152,7 +157,7 @@ defmodule BeamToExAstTest do
   test "module function body" do
     file = "lib/test_files/function_body.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionBody.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionBody.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -162,7 +167,7 @@ defmodule BeamToExAstTest do
   test "module functions" do
     file = "lib/test_files/functions.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctions.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctions.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -172,7 +177,7 @@ defmodule BeamToExAstTest do
   test "int" do
     file = "lib/test_files/function_int.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionInt.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionInt.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -182,7 +187,7 @@ defmodule BeamToExAstTest do
   test "float" do
     file = "lib/test_files/function_float.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionFloat.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionFloat.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -192,7 +197,7 @@ defmodule BeamToExAstTest do
   test "atom" do
     file = "lib/test_files/function_atom.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionAtom.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionAtom.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -203,7 +208,7 @@ defmodule BeamToExAstTest do
   test "lists" do
     file = "lib/test_files/function_lists.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionLists.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionLists.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -215,7 +220,7 @@ defmodule BeamToExAstTest do
   test "tuple" do
     file = "lib/test_files/function_tuple.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionTuple.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionTuple.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -225,7 +230,7 @@ defmodule BeamToExAstTest do
   test "map" do
     file = "lib/test_files/function_map.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionMap.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionMap.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -235,7 +240,7 @@ defmodule BeamToExAstTest do
   test "math" do
     file = "lib/test_files/function_math.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionMath.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionMath.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -245,7 +250,7 @@ defmodule BeamToExAstTest do
   test "bool compare" do
     file = "lib/test_files/function_bool_compare.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionBoolCompare.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionBoolCompare.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -255,21 +260,21 @@ defmodule BeamToExAstTest do
   test "case" do
     file = "lib/test_files/function_case.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionCase.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionCase.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     assert BeamToExAst.convert(mod_beam) == mod_ast
-    #mod_ast2 = BeamToExAst.convert(mod_beam)
-    #unless mod_ast2 == mod_ast do
-    #  find_diff(mod_ast2, mod_ast)
-    #end
+    # mod_ast2 = BeamToExAst.convert(mod_beam)
+    # unless mod_ast2 == mod_ast do
+    #   find_diff(mod_ast2, mod_ast)
+    # end
   end
 
   test "pipe" do
     file = "lib/test_files/function_pipe.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionPipe.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionPipe.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -279,7 +284,7 @@ defmodule BeamToExAstTest do
   test "binary" do
     file = "lib/test_files/function_binary.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionBinary.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionBinary.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
@@ -290,12 +295,12 @@ defmodule BeamToExAstTest do
   test "record" do
     file = "lib/test_files/function_record.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.TestFunctionRecord.beam'
+    beam_file = @builddir ++ 'Elixir.TestFunctionRecord.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    #IO.inspect(mod_beam)
-    #IO.inspect(mod_ast)
+    # IO.inspect(mod_beam)
+    # IO.inspect(mod_ast)
     assert BeamToExAst.convert(mod_beam) == mod_ast
   end
 
@@ -303,13 +308,12 @@ defmodule BeamToExAstTest do
   test "dogfood" do
     file = "lib/beam_to_ex_ast.ex"
     file_content = File.read!(file)
-    beam_file = '_build/test/lib/beam_to_ex_ast/ebin/Elixir.BeamToExAst.beam'
+    beam_file = @builddir ++ 'Elixir.BeamToExAst.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    #IO.inspect(mod_beam)
-    #IO.inspect(mod_ast)
+    # IO.inspect(mod_beam)
+    # IO.inspect(mod_ast)
     assert BeamToExAst.convert(mod_beam) == clean_ast(mod_ast)
   end
 end
-
