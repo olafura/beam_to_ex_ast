@@ -401,7 +401,9 @@ defmodule BeamToExAst do
     |> Atom.to_string
     |> String.replace("Elixir.", "")
 
-    case String.match?(s1, ~r"^[A-Z]") do
+    s1
+    |> String.match?(~r"^[A-Z]")
+    |> case do
       true -> s1
       false -> Macro.camelize(s1)
     end
@@ -416,7 +418,8 @@ defmodule BeamToExAst do
   end
 
   def half_clean_atom(a1) do
-    Atom.to_string(a1)
+    a1
+    |> Atom.to_string
     |> String.replace("Elixir.", "")
   end
 
