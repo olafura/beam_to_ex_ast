@@ -289,7 +289,7 @@ defmodule BeamToExAst do
           [[g]] ->
             {:->, [line: ln],
              [[{:when, [line: ln],
-               [params |> Enum.map(&convert_param_match/1) |> only_one,
+               [only_one(Enum.map(params, &convert_param_match/1)),
                 convert_param(g)]}], def_body_less_filter(body)]}
         end
       true -> {:&, [line: ln], [def_body_less_filter(body)]}

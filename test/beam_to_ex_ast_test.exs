@@ -12,12 +12,20 @@ defmodule BeamToExAstTest do
   end
 
   # I can't know if it was a pipe or not
-  def clean_ast({:|>, _line1, [p1, {c1, line2, p2}]}) do
-    {c1, line2, Enum.concat([p1], p2)}
+  def clean_ast({:|>, _line1, [p1, {c1, line2, nil}]}) do
+    {c1, line2, Enum.concat([p1], [])}
   end
 
-  def clean_ast({a1, line1, l1}) when is_list(l1) do
-    {a1, line1, Enum.map(l1, &clean_ast/1)}
+  def clean_ast({:|>, _line1, [p1, {c1, line2, p2}]}) do
+    {c1, line2, Enum.concat([clean_ast(p1)], clean_ast(p2))}
+  end
+
+  def clean_ast({a1, line1, l1, {a2, line2, l2, l3}}) when is_list(l3) do
+    {a1, line1, l1, {a2, line2, l2, Enum.map(l3, &clean_ast/1)}}
+  end
+
+  def clean_ast({{a1, line1, nil}, {b1, line2, l1}}) when is_list(l1) do
+    {{a1, line1, nil}, {b1, line2, Enum.map(l1, &clean_ast/1)}}
   end
 
   def clean_ast([do: {:__block__, g1, l1}]) do
@@ -26,6 +34,10 @@ defmodule BeamToExAstTest do
 
   def clean_ast([do: p1]) do
     [do: clean_ast(p1)]
+  end
+
+  def clean_ast([:when, line1, l1]) when is_list(l1) do
+    [:when, line1, Enum.map(l1, &clean_ast/1)]
   end
 
   # The atom can't get the line number
@@ -37,6 +49,19 @@ defmodule BeamToExAstTest do
 
   def clean_ast(l1) when is_list(l1) do
     Enum.map(l1, &clean_ast/1)
+  end
+
+  def clean_ast({a1, line1, [{a2, line2, [{a3, line3, nil}]}, [do: l1]]}) do
+    {a1, line1, [{a2, line2, [{a3, line3, nil}]},
+     [do: Enum.map(l1, &clean_ast/1)]]}
+  end
+
+  def clean_ast({a1, [line: ln1], [:when, [line: ln2], l1]}) when is_list(l1) do
+    {a1, [line: ln1], [:when, [line: ln2], Enum.map(l1, &clean_ast/1)]}
+  end
+
+  def clean_ast({a1, [line: ln1], l1}) when is_list(l1) do
+    {a1, [line: ln1], Enum.map(l1, &clean_ast/1)}
   end
 
   def clean_ast(ast) do
@@ -313,7 +338,11 @@ defmodule BeamToExAstTest do
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     # IO.inspect(mod_beam)
-    # IO.inspect(mod_ast)
+    # IO.inspect(clean_ast(mod_ast))
     assert BeamToExAst.convert(mod_beam) == clean_ast(mod_ast)
+    # mod_ast2 = BeamToExAst.convert(mod_beam)
+    # unless mod_ast2 == clean_ast(mod_ast) do
+    #   find_diff(mod_ast2, clean_ast(mod_ast))
+    # end
   end
 end
