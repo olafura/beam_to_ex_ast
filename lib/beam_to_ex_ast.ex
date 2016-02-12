@@ -71,7 +71,9 @@ defmodule BeamToExAst do
   end
 
   def def_body_less_filter(items) do
-    items2 = Enum.filter(Enum.map(items, &convert_param/1), &filter_empty/1)
+    items2 = items
+    |> Enum.map(&convert_param/1)
+    |> Enum.filter(&filter_empty/1)
     case length(items2) do
       1 -> List.first(items2)
       _ -> {:__block__, [], items2}
@@ -79,7 +81,7 @@ defmodule BeamToExAst do
   end
 
   def get_caller(c_mod_call, ln, caller, params) do
-    case String.match?(c_mod_call, ~r/^[A-Z]/) do
+    case String.match?(c_mod_call, ~r"^[A-Z]") do
       true -> {{:., [line: ln],
                 [{:__aliases__, [counter: 0, line: ln],
                  [String.to_atom(c_mod_call)]}, clean_atom(caller)]},
@@ -287,7 +289,7 @@ defmodule BeamToExAst do
           [[g]] ->
             {:->, [line: ln],
              [[{:when, [line: ln],
-               [only_one(Enum.map(params, &convert_param_match/1)),
+               [params |> Enum.map(&convert_param_match/1) |> only_one,
                 convert_param(g)]}], def_body_less_filter(body)]}
         end
       true -> {:&, [line: ln], [def_body_less_filter(body)]}
@@ -395,28 +397,34 @@ defmodule BeamToExAst do
   end
 
   def clean_module(a1) do
-    s1 = Atom.to_string(a1)
-    s1 = String.replace(s1, "Elixir.", "")
-    s1 = case String.match?(s1, ~r/^[A-Z]/) do
+    s1 = a1
+    |> Atom.to_string
+    |> String.replace("Elixir.", "")
+
+    case String.match?(s1, ~r"^[A-Z]") do
       true -> s1
       false -> Macro.camelize(s1)
     end
-    String.to_atom(s1)
+    |> String.to_atom
   end
 
   def clean_atom(a1) do
-    s1 = Atom.to_string(a1)
-    String.to_atom(String.replace(s1, "Elixir.", ""))
+    a1
+    |> Atom.to_string
+    |> String.replace("Elixir.", "")
+    |> String.to_atom
   end
 
   def half_clean_atom(a1) do
-    s1 = Atom.to_string(a1)
-    String.replace(s1, "Elixir.", "")
+    Atom.to_string(a1)
+    |> String.replace("Elixir.", "")
   end
 
   def clean_var(v1) do
-    s1 = Atom.to_string(v1)
-    String.to_atom(String.replace(s1, ~r/@\d+/, ""))
+    v1
+    |> Atom.to_string
+    |> String.replace(~r"@\d+", "")
+    |> String.to_atom
   end
 
   def filter_empty(:filter_this_thing_out_of_the_list_please) do
