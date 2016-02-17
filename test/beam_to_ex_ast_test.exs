@@ -170,7 +170,7 @@ defmodule BeamToExAstTest do
   end
 
   test "module" do
-    file = "lib/test_files/function.ex"
+    file = "test/support/function.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunction.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -180,7 +180,7 @@ defmodule BeamToExAstTest do
   end
 
   test "module function body" do
-    file = "lib/test_files/function_body.ex"
+    file = "test/support/function_body.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionBody.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -190,7 +190,7 @@ defmodule BeamToExAstTest do
   end
 
   test "module functions" do
-    file = "lib/test_files/functions.ex"
+    file = "test/support/functions.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctions.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -200,7 +200,7 @@ defmodule BeamToExAstTest do
   end
 
   test "int" do
-    file = "lib/test_files/function_int.ex"
+    file = "test/support/function_int.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionInt.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -210,7 +210,7 @@ defmodule BeamToExAstTest do
   end
 
   test "float" do
-    file = "lib/test_files/function_float.ex"
+    file = "test/support/function_float.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionFloat.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -220,7 +220,7 @@ defmodule BeamToExAstTest do
   end
 
   test "atom" do
-    file = "lib/test_files/function_atom.ex"
+    file = "test/support/function_atom.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionAtom.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -231,7 +231,7 @@ defmodule BeamToExAstTest do
 
   @tag :wip
   test "lists" do
-    file = "lib/test_files/function_lists.ex"
+    file = "test/support/function_lists.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionLists.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -243,7 +243,7 @@ defmodule BeamToExAstTest do
   end
 
   test "tuple" do
-    file = "lib/test_files/function_tuple.ex"
+    file = "test/support/function_tuple.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionTuple.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -253,7 +253,7 @@ defmodule BeamToExAstTest do
   end
 
   test "map" do
-    file = "lib/test_files/function_map.ex"
+    file = "test/support/function_map.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionMap.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -263,7 +263,7 @@ defmodule BeamToExAstTest do
   end
 
   test "math" do
-    file = "lib/test_files/function_math.ex"
+    file = "test/support/function_math.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionMath.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -273,7 +273,7 @@ defmodule BeamToExAstTest do
   end
 
   test "bool compare" do
-    file = "lib/test_files/function_bool_compare.ex"
+    file = "test/support/function_bool_compare.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionBoolCompare.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -283,7 +283,7 @@ defmodule BeamToExAstTest do
   end
 
   test "case" do
-    file = "lib/test_files/function_case.ex"
+    file = "test/support/function_case.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionCase.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -297,7 +297,7 @@ defmodule BeamToExAstTest do
   end
 
   test "pipe" do
-    file = "lib/test_files/function_pipe.ex"
+    file = "test/support/function_pipe.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionPipe.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -307,7 +307,7 @@ defmodule BeamToExAstTest do
   end
 
   test "binary" do
-    file = "lib/test_files/function_binary.ex"
+    file = "test/support/function_binary.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionBinary.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -318,7 +318,7 @@ defmodule BeamToExAstTest do
 
   @tag :wip
   test "record" do
-    file = "lib/test_files/function_record.ex"
+    file = "test/support/function_record.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.TestFunctionRecord.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
@@ -331,7 +331,7 @@ defmodule BeamToExAstTest do
 
   @tag :wip
   test "dogfood" do
-    file = "lib/beam_to_ex_ast.ex"
+    file = "test/beam_to_ex_ast.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.BeamToExAst.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
