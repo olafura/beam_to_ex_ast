@@ -331,7 +331,7 @@ defmodule BeamToExAstTest do
 
   @tag :wip
   test "dogfood" do
-    file = "test/beam_to_ex_ast.ex"
+    file = "lib/beam_to_ex_ast.ex"
     file_content = File.read!(file)
     beam_file = @builddir ++ 'Elixir.BeamToExAst.beam'
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
