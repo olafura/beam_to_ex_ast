@@ -138,4 +138,5 @@ defmodule BeamToExAstTestUtils do
   end
 end
 
+ExUnit.configure(exclude: [wip: true, dogfood: true])
 ExUnit.start()

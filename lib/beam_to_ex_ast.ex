@@ -217,7 +217,8 @@ defmodule BeamToExAst do
     end
   end
 
-  def convert_param({:tuple, ln, [{:atom, _ln, a1}, {:atom, _ln2, a2}]}) do
+  def convert_param({:tuple, ln, [{:atom, _ln2, a1}, {:atom, _ln3, a2}]}) do
+    # Need the correct line number to dogfood
     {a1, {:__aliases__, [counter: 0, line: ln], [clean_atom(a2)]}}
   end
 
@@ -236,10 +237,11 @@ defmodule BeamToExAst do
   def convert_param({:map, ln, items}) do
     case Enum.map(items, &convert_param/1) do
       [__struct__: Regex,
-       opts: "",
-       re_pattern: {:{}, [line: ln2],
-                    [:re_pattern, 0, 0, 0, _]}, source: b1] ->
-        {:sigil_r, [line: ln2], [{:<<>>, [line: ln2], [b1]}, []]}
+        opts: "",
+        re_pattern: {:{}, [line: ln2], [:re_pattern, 0, 0, 0, _]},
+        re_version: _,
+        source: b1] ->
+          {:sigil_r, [line: ln2], [{:<<>>, [line: ln2], [b1]}, []]}
       p1 -> {:%{}, [line: ln], p1}
     end
   end
@@ -374,10 +376,13 @@ defmodule BeamToExAst do
     []
   end
 
+  # I need to explore this more with size and other conditions
+  def convert_bin_match({:bin_element, _ln, {:var, ln2, v1}, _, [:integer]}) do
+    convert_param({:var, ln2, v1})
+  end
   def convert_bin_match({:bin_element, ln, {:var, ln2, v1}, _, [type]}) do
     {:::, [line: ln], [convert_param({:var, ln2, v1}), {type, [line: ln], nil}]}
   end
-
   def convert_bin_match(b1) do
     convert_bin(b1)
   end
