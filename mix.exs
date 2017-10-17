@@ -5,6 +5,7 @@ defmodule BeamToExAst.Mixfile do
     [app: :beam_to_ex_ast,
      version: "0.0.1",
      elixir: "~> 1.1",
+     compilers: Mix.compilers ++ [:protocol_ex],
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -31,6 +32,9 @@ defmodule BeamToExAst.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:dogma, "~> 0.0", only: :dev}]
+    [
+      {:protocol_ex, "~> 0.3.0"},
+      {:dogma, "~> 0.0", only: :dev}
+    ]
   end
 end
