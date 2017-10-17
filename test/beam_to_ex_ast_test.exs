@@ -49,7 +49,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert clean_ast(BeamToExAst.convert(mod_beam)) == clean_ast(mod_ast)
   end
 
   test "module functions" do
@@ -167,7 +167,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == clean_ast(mod_ast)
+    assert clean_ast(BeamToExAst.convert(mod_beam)) == clean_ast(mod_ast)
   end
 
   test "binary" do
@@ -203,7 +203,7 @@ defmodule BeamToExAstTest do
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     # IO.inspect(mod_beam)
     # IO.inspect(clean_ast(mod_ast))
-    assert BeamToExAst.convert(mod_beam) == clean_ast(mod_ast)
+    assert clean_ast(BeamToExAst.convert(mod_beam)) == clean_ast(mod_ast)
     # mod_ast2 = BeamToExAst.convert(mod_beam)
     # unless mod_ast2 == clean_ast(mod_ast) do
     #   find_diff(mod_ast2, clean_ast(mod_ast))

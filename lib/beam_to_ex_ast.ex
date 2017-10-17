@@ -22,15 +22,12 @@ defmodule BeamToExAst do
   def do_convert({:attribute, _ln, :module, name}, {_, rest}) do
    {clean_module(name), rest}
   end
-
   def do_convert({:attribute, _, _, _}, acc) do
     acc
   end
-
   def do_convert({:function, _, :__info__, _, _}, acc) do
     acc
   end
-
   def do_convert({:function, _ln, name, _n, body}, {mod_name, rest}) do
     {mod_name, Enum.concat(Enum.map(body, fn
       {:clause, ln2, params, guard, body_def} ->
@@ -49,6 +46,11 @@ defmodule BeamToExAst do
                     [{:when, [line: ln2],
                       [{name, [line: ln2], Translate.to_elixir(params)},
                         Translate.to_elixir(g)]}, def_body(body_def)]}
+          [g1, g2] -> {:def, [line: ln2],
+                        [{:when, [line: ln2],
+                          [{name, [line: ln2], Translate.to_elixir(params)},
+                          {:and, [], [Translate.to_elixir(List.first(g1)), Translate.to_elixir(List.first(g2))]}]}, def_body(body_def)]}
+
         end
       _ -> IO.inspect(body)
     end), rest)}
