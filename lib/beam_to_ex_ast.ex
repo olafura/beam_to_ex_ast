@@ -200,22 +200,6 @@ defmodule BeamToExAst do
     true
   end
 
-  def convert_bin({:bin_element, _ln, {:string, _ln2, str}, _, _}) do
-    List.to_string(str)
-  end
-
-  def convert_bin({:bin_element, _ln, {:var, ln2, v1}, _, [_type]}) do
-    Translate.to_elixir({:var, ln2, v1})
-  end
-
-  def convert_bin({:bin_element, _ln, {:var, ln2, v1}, _, :default}) do
-    Translate.to_elixir({:var, ln2, v1})
-  end
-
-  def convert_bin(nil) do
-    []
-  end
-
   # I need to explore this more with size and other conditions
   def convert_bin_match({:bin_element, _ln, {:var, ln2, v1}, _, [:integer]}) do
     Translate.to_elixir({:var, ln2, v1})
@@ -224,7 +208,7 @@ defmodule BeamToExAst do
     {:::, [line: ln], [Translate.to_elixir({:var, ln2, v1}), {type, [line: ln], nil}]}
   end
   def convert_bin_match(b1) do
-    convert_bin(b1)
+    Translate.to_elixir(b1)
   end
 
   def clean_op(op1) do
