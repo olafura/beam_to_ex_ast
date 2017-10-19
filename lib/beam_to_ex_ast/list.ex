@@ -1,7 +1,7 @@
 import ProtocolEx
 alias BeamToExAst.Translate
 
-defimplEx BeamToExAst.List, list when is_list(list), for: Translate do
+defimplEx BeamToExAst.List, params when is_list(params), for: Translate do
   import BeamToExAst
   alias BeamToExAst.Translate
 
