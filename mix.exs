@@ -34,6 +34,7 @@ defmodule BeamToExAst.Mixfile do
   defp deps do
     [
       {:protocol_ex, "~> 0.3.0"},
+      {:forms, "~> 0.0.1"},
       {:dogma, "~> 0.0", only: :dev}
     ]
   end
