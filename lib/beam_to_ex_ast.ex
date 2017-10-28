@@ -52,7 +52,7 @@ defmodule BeamToExAst do
                           {:and, [], [Translate.to_elixir(List.first(g1)), Translate.to_elixir(List.first(g2))]}]}, def_body(body_def)]}
 
         end
-      _ -> IO.inspect(body)
+      _ -> body
     end), rest)}
   end
 
@@ -61,9 +61,15 @@ defmodule BeamToExAst do
   end
 
   def def_body(items) do
-    case length(items) do
-      1 -> [do: Translate.to_elixir(List.first(items))]
-      _ -> [do: {:__block__, [], Enum.map(items, &Translate.to_elixir/1)}]
+    filtered_items = items
+    |> Enum.filter(fn
+      {:atom, _, nil} -> false
+      _ -> true
+    end)
+
+    case length(filtered_items) do
+      1 -> [do: Translate.to_elixir(List.first(filtered_items))]
+      _ -> [do: {:__block__, [], Enum.map(filtered_items, &Translate.to_elixir/1)}]
     end
   end
 

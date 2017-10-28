@@ -92,7 +92,6 @@ defmodule BeamToExAstTest do
     assert BeamToExAst.convert(mod_beam) == mod_ast
   end
 
-  @tag :wip
   test "lists" do
     file = "test/support/function_lists.ex"
     file_content = File.read!(file)
@@ -100,8 +99,8 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    IO.inspect(mod_beam)
-    IO.inspect(mod_ast)
+    # IO.inspect(mod_beam)
+    # IO.inspect(mod_ast)
     assert BeamToExAst.convert(mod_beam) == mod_ast
   end
 
