@@ -6,6 +6,7 @@ defimplEx BeamToExAst.Try, {:try, _ln, _params, _else_params, _catch_rescue_para
   alias BeamToExAst.Translate
 
   def to_elixir({:try, ln, params, else_params, catch_rescue_params, after_params}, opts) do
+    opts = Map.update!(opts, :parents, &([:try | &1]))
     {:try, [line: ln], [
         [
           do: Translate.to_elixir(params, opts),

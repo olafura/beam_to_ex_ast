@@ -13,6 +13,7 @@ defimplEx BeamToExAst.Bc, {:bc, _ln, _param1, _param2}, for: Translate do
   end
 
   def to_elixir({:bc, ln, param1, param2}, opts) do
+    opts = Map.update!(opts, :parents, &([:bc | &1]))
     {:for, [line: ln], uncase(param2, opts) ++ [[into: "", do: Translate.to_elixir(param1, opts)]]}
   end
 end

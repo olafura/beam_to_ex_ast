@@ -29,7 +29,7 @@ defmodule BeamToExAst do
     acc
   end
   def do_convert({:function, _ln, name, _n, body}, {mod_name, rest}) do
-    opts = %{}
+    opts = %{parents: [:function]}
     {mod_name, Enum.concat(Enum.map(body, fn
       {:clause, ln2, params, guard, body_def} ->
         case guard do
@@ -62,6 +62,7 @@ defmodule BeamToExAst do
   end
 
   def def_body(items, opts) do
+    opts = Map.update!(opts, :parents, &([:body | &1]))
     filtered_items = items
     |> Enum.filter(fn
       {:atom, _, nil} -> false
@@ -75,6 +76,7 @@ defmodule BeamToExAst do
   end
 
   def def_body_less(items, opts) do
+    opts = Map.update!(opts, :parents, &([:body_less | &1]))
     case length(items) do
       1 -> Translate.to_elixir(List.first(items), opts)
       _ -> {:__block__, [], Translate.to_elixir(items, opts)}
@@ -82,6 +84,7 @@ defmodule BeamToExAst do
   end
 
   def def_body_less_filter(items, opts) do
+    opts = Map.update!(opts, :parents, &([:body_less_filter | &1]))
     items2 = items
     |> Translate.to_elixir(opts)
     |> Enum.filter(&filter_empty/1)
@@ -105,24 +108,28 @@ defmodule BeamToExAst do
 
   def def_caller({:remote, ln, {:atom, _ln, :erlang},
                   {:atom, ln2, :atom_to_binary}}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:remote | &1]))
     {{:., [line: ln],
       [{:__aliases__, [counter: 0, line: ln2],[:Atom]}, :to_string]},
      [line: ln2], List.delete_at(Translate.to_elixir(params, opts), -1)}
   end
   def def_caller({:remote, ln, {:atom, _ln, :erlang},
                   {:atom, ln2, :binary_to_atom}}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:remote | &1]))
     {{:., [line: ln],
       [{:__aliases__, [counter: 0, line: ln2], [:String]}, :to_atom]},
      [line: ln2], List.delete_at(Translate.to_elixir(params, opts), -1)}
   end
   def def_caller({:remote, ln, {:atom, _ln, :erlang},
                   {:atom, ln2, :binary_to_integer}}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:remote | &1]))
     {{:., [line: ln],
       [{:__aliases__, [counter: 0, line: ln2], [:String]}, :to_integer]},
      [line: ln2], Translate.to_elixir(params, opts)}
   end
   def def_caller({:remote, ln,{:atom, _, mod_call},
                  {:atom, _, caller}}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:remote | &1]))
     case half_clean_atom(mod_call) do
       "erlang" -> {caller, [line: ln],  Translate.to_elixir(params, opts)}
       "Kernel" -> {caller, [line: ln],  Translate.to_elixir(params, opts)}
@@ -130,9 +137,11 @@ defmodule BeamToExAst do
     end
   end
   def def_caller({:atom, ln, caller}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:atom | &1]))
     {caller, [line: ln], Translate.to_elixir(params, opts)}
   end
   def def_caller({:var, ln, caller}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:var | &1]))
     {{:., [line: ln],
       [{clean_var(caller), [line: ln], nil}]},
      [line: ln], Translate.to_elixir(params, opts)}

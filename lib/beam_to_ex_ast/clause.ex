@@ -6,6 +6,7 @@ defimplEx BeamToExAst.Clause, {:clause, _ln, _params, _guard, _body}, for: Trans
   alias BeamToExAst.Translate
 
   def to_elixir({:clause, ln, params, guard, body}, opts) do
+    opts = Map.update!(opts, :parents, &([:clause | &1]))
     case check_params(params) do
       false ->
         case guard do

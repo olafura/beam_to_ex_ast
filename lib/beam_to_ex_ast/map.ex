@@ -6,6 +6,7 @@ defimplEx BeamToExAst.Map, {:map, _ln, _items}, for: Translate do
   alias BeamToExAst.Translate
 
   def to_elixir({:map, ln, items}, opts) do
+    opts = Map.update!(opts, :parents, &([:map | &1]))
     case Translate.to_elixir(items, opts) do
       [__struct__: Regex,
         opts: "",
