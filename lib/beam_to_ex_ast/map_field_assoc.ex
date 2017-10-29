@@ -5,7 +5,8 @@ defimplEx BeamToExAst.MapFieldAssoc, {:map_field_assoc, _ln, _key, _val}, for: T
   import BeamToExAst
   alias BeamToExAst.Translate
 
-  def to_elixir({:map_field_assoc, _ln, key, val}) do
-    {Translate.to_elixir(key), Translate.to_elixir(val)}
+  def to_elixir({:map_field_assoc, _ln, key, val}, opts) do
+    opts = Map.update!(opts, :parents, &([:map_field_assoc | &1]))
+    {Translate.to_elixir(key, opts), Translate.to_elixir(val, opts)}
   end
 end

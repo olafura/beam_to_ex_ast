@@ -5,12 +5,13 @@ defimplEx BeamToExAst.Bin, {:bin, _ln, _params}, for: Translate do
   import BeamToExAst
   alias BeamToExAst.Translate
 
-  def to_elixir({:bin, _ln, []}) do
+  def to_elixir({:bin, _ln, []}, _) do
     ""
   end
-  def to_elixir({:bin, ln, elements}) do
+  def to_elixir({:bin, ln, elements}, opts) do
+    opts = Map.update!(opts, :parents, &([:bin | &1]))
     elements
-    |> Translate.to_elixir()
+    |> Translate.to_elixir(opts)
     |> Enum.filter(fn
       {:atom, _, nil} -> false
       _ -> true

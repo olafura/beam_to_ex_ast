@@ -29,6 +29,7 @@ defmodule BeamToExAst do
     acc
   end
   def do_convert({:function, _ln, name, _n, body}, {mod_name, rest}) do
+    opts = %{parents: [:function]}
     {mod_name, Enum.concat(Enum.map(body, fn
       {:clause, ln2, params, guard, body_def} ->
         case guard do
@@ -37,19 +38,19 @@ defmodule BeamToExAst do
              [line: ln2],
              [{name,
                [line: ln2],
-               Translate.to_elixir(params)
+               Translate.to_elixir(params, opts)
               },
-              def_body(body_def)
+              def_body(body_def, opts)
              ]
             }
           [[g]] -> {:def, [line: ln2],
                     [{:when, [line: ln2],
-                      [{name, [line: ln2], Translate.to_elixir(params)},
-                        Translate.to_elixir(g)]}, def_body(body_def)]}
+                      [{name, [line: ln2], Translate.to_elixir(params, opts)},
+                        Translate.to_elixir(g, opts)]}, def_body(body_def, opts)]}
           [g1, g2] -> {:def, [line: ln2],
                         [{:when, [line: ln2],
-                          [{name, [line: ln2], Translate.to_elixir(params)},
-                          {:and, [], [Translate.to_elixir(List.first(g1)), Translate.to_elixir(List.first(g2))]}]}, def_body(body_def)]}
+                          [{name, [line: ln2], Translate.to_elixir(params, opts)},
+                          {:and, [], [Translate.to_elixir(List.first(g1), opts), Translate.to_elixir(List.first(g2), opts)]}]}, def_body(body_def, opts)]}
 
         end
       _ -> body
@@ -60,7 +61,8 @@ defmodule BeamToExAst do
     acc
   end
 
-  def def_body(items) do
+  def def_body(items, opts) do
+    opts = Map.update!(opts, :parents, &([:body | &1]))
     filtered_items = items
     |> Enum.filter(fn
       {:atom, _, nil} -> false
@@ -68,21 +70,23 @@ defmodule BeamToExAst do
     end)
 
     case length(filtered_items) do
-      1 -> [do: Translate.to_elixir(List.first(filtered_items))]
-      _ -> [do: {:__block__, [], Enum.map(filtered_items, &Translate.to_elixir/1)}]
+      1 -> [do: Translate.to_elixir(List.first(filtered_items), opts)]
+      _ -> [do: {:__block__, [], Translate.to_elixir(filtered_items, opts)}]
     end
   end
 
-  def def_body_less(items) do
+  def def_body_less(items, opts) do
+    opts = Map.update!(opts, :parents, &([:body_less | &1]))
     case length(items) do
-      1 -> Translate.to_elixir(List.first(items))
-      _ -> {:__block__, [], Translate.to_elixir(items)}
+      1 -> Translate.to_elixir(List.first(items), opts)
+      _ -> {:__block__, [], Translate.to_elixir(items, opts)}
     end
   end
 
-  def def_body_less_filter(items) do
+  def def_body_less_filter(items, opts) do
+    opts = Map.update!(opts, :parents, &([:body_less_filter | &1]))
     items2 = items
-    |> Translate.to_elixir()
+    |> Translate.to_elixir(opts)
     |> Enum.filter(&filter_empty/1)
     case length(items2) do
       1 -> List.first(items2)
@@ -90,56 +94,57 @@ defmodule BeamToExAst do
     end
   end
 
-  def get_caller(c_mod_call, ln, caller, params) do
+  def get_caller(c_mod_call, ln, caller, params, opts) do
     case String.match?(c_mod_call, ~r"^[A-Z]") do
       true -> {{:., [line: ln],
                 [{:__aliases__, [counter: 0, line: ln],
                  [String.to_atom(c_mod_call)]}, clean_atom(caller)]},
-               [line: ln], Translate.to_elixir(params)}
+               [line: ln], Translate.to_elixir(params, opts)}
       false -> {{:., [line: ln],
                  [String.to_atom(c_mod_call), clean_atom(caller)]},
-                [line: ln], Translate.to_elixir(params)}
+                [line: ln], Translate.to_elixir(params, opts)}
     end
   end
 
   def def_caller({:remote, ln, {:atom, _ln, :erlang},
-                  {:atom, ln2, :atom_to_binary}}, params) do
+                  {:atom, ln2, :atom_to_binary}}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:remote | &1]))
     {{:., [line: ln],
       [{:__aliases__, [counter: 0, line: ln2],[:Atom]}, :to_string]},
-     [line: ln2], List.delete_at(Translate.to_elixir(params), -1)}
+     [line: ln2], List.delete_at(Translate.to_elixir(params, opts), -1)}
   end
-
   def def_caller({:remote, ln, {:atom, _ln, :erlang},
-                  {:atom, ln2, :binary_to_atom}}, params) do
+                  {:atom, ln2, :binary_to_atom}}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:remote | &1]))
     {{:., [line: ln],
       [{:__aliases__, [counter: 0, line: ln2], [:String]}, :to_atom]},
-     [line: ln2], List.delete_at(Translate.to_elixir(params), -1)}
+     [line: ln2], List.delete_at(Translate.to_elixir(params, opts), -1)}
   end
-
   def def_caller({:remote, ln, {:atom, _ln, :erlang},
-                  {:atom, ln2, :binary_to_integer}}, params) do
+                  {:atom, ln2, :binary_to_integer}}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:remote | &1]))
     {{:., [line: ln],
       [{:__aliases__, [counter: 0, line: ln2], [:String]}, :to_integer]},
-     [line: ln2], Translate.to_elixir(params)}
+     [line: ln2], Translate.to_elixir(params, opts)}
   end
-
   def def_caller({:remote, ln,{:atom, _, mod_call},
-                 {:atom, _, caller}}, params) do
+                 {:atom, _, caller}}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:remote | &1]))
     case half_clean_atom(mod_call) do
-      "erlang" -> {caller, [line: ln],  Translate.to_elixir(params)}
-      "Kernel" -> {caller, [line: ln],  Translate.to_elixir(params)}
-      c_mod_call -> get_caller(c_mod_call, ln, caller, params)
+      "erlang" -> {caller, [line: ln],  Translate.to_elixir(params, opts)}
+      "Kernel" -> {caller, [line: ln],  Translate.to_elixir(params, opts)}
+      c_mod_call -> get_caller(c_mod_call, ln, caller, params, opts)
     end
   end
-
-  def def_caller({:atom, ln, caller}, params) do
-    {caller, [line: ln], Translate.to_elixir(params)}
+  def def_caller({:atom, ln, caller}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:atom | &1]))
+    {caller, [line: ln], Translate.to_elixir(params, opts)}
   end
-
-  def def_caller({:var, ln, caller}, params) do
+  def def_caller({:var, ln, caller}, params, opts) do
+    opts = Map.update!(opts, :parents, &([:var | &1]))
     {{:., [line: ln],
       [{clean_var(caller), [line: ln], nil}]},
-     [line: ln], Translate.to_elixir(params)}
+     [line: ln], Translate.to_elixir(params, opts)}
   end
 
   def remove_tuples(l1) when is_list(l1) do
@@ -165,8 +170,8 @@ defmodule BeamToExAst do
     end
   end
 
-  def convert_param_match({:bin, ln, elements}) do
-    case Enum.map(elements, &convert_bin_match/1) do
+  def convert_param_match({:bin, ln, elements}, opts) do
+    case Enum.map(elements, &(convert_bin_match(&1, opts))) do
       bins when length(bins) === 1 -> List.first(bins)
       bins ->
         case Enum.reduce(bins, false, &check_bins/2) do
@@ -175,8 +180,8 @@ defmodule BeamToExAst do
         end
     end
   end
-  def convert_param_match(i1) do
-    Translate.to_elixir(i1)
+  def convert_param_match(i1, opts) do
+    Translate.to_elixir(i1, opts)
   end
 
   def insert_line_number({:&, [line: 0], number}, ln) do
@@ -207,14 +212,14 @@ defmodule BeamToExAst do
   end
 
   # I need to explore this more with size and other conditions
-  def convert_bin_match({:bin_element, _ln, {:var, ln2, v1}, _, [:integer]}) do
-    Translate.to_elixir({:var, ln2, v1})
+  def convert_bin_match({:bin_element, _ln, {:var, ln2, v1}, _, [:integer]}, opts) do
+    Translate.to_elixir({:var, ln2, v1}, opts)
   end
-  def convert_bin_match({:bin_element, ln, {:var, ln2, v1}, _, [type]}) do
-    {:::, [line: ln], [Translate.to_elixir({:var, ln2, v1}), {type, [line: ln], nil}]}
+  def convert_bin_match({:bin_element, ln, {:var, ln2, v1}, _, [type]}, opts) do
+    {:::, [line: ln], [Translate.to_elixir({:var, ln2, v1}, opts), {type, [line: ln], nil}]}
   end
-  def convert_bin_match(b1) do
-    Translate.to_elixir(b1)
+  def convert_bin_match(b1, opts) do
+    Translate.to_elixir(b1, opts)
   end
 
   def clean_op(op1) do
