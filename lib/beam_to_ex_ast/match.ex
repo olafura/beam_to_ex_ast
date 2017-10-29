@@ -13,6 +13,6 @@ defimplEx BeamToExAst.Match, {:match, _ln, _param1, _param2}, for: Translate do
   end
   def to_elixir({:match, ln, m1, m2}, opts) do
     opts = Map.update!(opts, :parents, &([:match | &1]))
-    {:=, [line: ln], [convert_param_match(m1, opts), Translate.to_elixir(m2, opts)]}
+    {:=, [line: ln], [Translate.to_elixir(m1, opts), Translate.to_elixir(m2, opts)]}
   end
 end
