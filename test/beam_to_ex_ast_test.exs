@@ -192,6 +192,19 @@ defmodule BeamToExAstTest do
     assert BeamToExAst.convert(mod_beam) == mod_ast
   end
 
+  @tag :wip
+  test "try" do
+    file = "test/support/function_try.ex"
+    file_content = File.read!(file)
+    beam_file = @builddir ++ 'Elixir.TestFunctionTry.beam'
+    {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
+      :beam_lib.chunks(beam_file, [:abstract_code])
+    {:ok, mod_ast} = Code.string_to_quoted(file_content)
+    # IO.inspect(mod_beam)
+    # IO.inspect(mod_ast)
+    assert BeamToExAst.convert(mod_beam) == mod_ast
+  end
+
   @tag :dogfood
   test "dogfood" do
     file = "lib/beam_to_ex_ast.ex"
