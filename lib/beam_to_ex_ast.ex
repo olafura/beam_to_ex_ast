@@ -170,20 +170,6 @@ defmodule BeamToExAst do
     end
   end
 
-  def convert_param_match({:bin, ln, elements}, opts) do
-    case Enum.map(elements, &(convert_bin_match(&1, opts))) do
-      bins when length(bins) === 1 -> List.first(bins)
-      bins ->
-        case Enum.reduce(bins, false, &check_bins/2) do
-          true -> {:<<>>, [line: ln], bins}
-          false -> bins
-        end
-    end
-  end
-  def convert_param_match(i1, opts) do
-    Translate.to_elixir(i1, opts)
-  end
-
   def insert_line_number({:&, [line: 0], number}, ln) do
     {:&, [line: ln], number}
   end
@@ -209,17 +195,6 @@ defmodule BeamToExAst do
 
   def check_bins(_, _acc) do
     true
-  end
-
-  # I need to explore this more with size and other conditions
-  def convert_bin_match({:bin_element, _ln, {:var, ln2, v1}, _, [:integer]}, opts) do
-    Translate.to_elixir({:var, ln2, v1}, opts)
-  end
-  def convert_bin_match({:bin_element, ln, {:var, ln2, v1}, _, [type]}, opts) do
-    {:::, [line: ln], [Translate.to_elixir({:var, ln2, v1}, opts), {type, [line: ln], nil}]}
-  end
-  def convert_bin_match(b1, opts) do
-    Translate.to_elixir(b1, opts)
   end
 
   def clean_op(op1) do
