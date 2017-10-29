@@ -5,8 +5,8 @@ defimplEx BeamToExAst.Map, {:map, _ln, _items}, for: Translate do
   import BeamToExAst
   alias BeamToExAst.Translate
 
-  def to_elixir({:map, ln, items}) do
-    case Translate.to_elixir(items) do
+  def to_elixir({:map, ln, items}, opts) do
+    case Translate.to_elixir(items, opts) do
       [__struct__: Regex,
         opts: "",
         re_pattern: {:{}, [line: ln2], [:re_pattern, 0, 0, 0, _]},
