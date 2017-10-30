@@ -106,47 +106,6 @@ defmodule BeamToExAst do
     end
   end
 
-  def def_caller({:remote, ln, {:atom, _ln, :erlang},
-                  {:atom, ln2, :atom_to_binary}}, params, opts) do
-    opts = Map.update!(opts, :parents, &([:remote | &1]))
-    {{:., [line: ln],
-      [{:__aliases__, [counter: 0, line: ln2],[:Atom]}, :to_string]},
-     [line: ln2], List.delete_at(Translate.to_elixir(params, opts), -1)}
-  end
-  def def_caller({:remote, ln, {:atom, _ln, :erlang},
-                  {:atom, ln2, :binary_to_atom}}, params, opts) do
-    opts = Map.update!(opts, :parents, &([:remote | &1]))
-    {{:., [line: ln],
-      [{:__aliases__, [counter: 0, line: ln2], [:String]}, :to_atom]},
-     [line: ln2], List.delete_at(Translate.to_elixir(params, opts), -1)}
-  end
-  def def_caller({:remote, ln, {:atom, _ln, :erlang},
-                  {:atom, ln2, :binary_to_integer}}, params, opts) do
-    opts = Map.update!(opts, :parents, &([:remote | &1]))
-    {{:., [line: ln],
-      [{:__aliases__, [counter: 0, line: ln2], [:String]}, :to_integer]},
-     [line: ln2], Translate.to_elixir(params, opts)}
-  end
-  def def_caller({:remote, ln,{:atom, _, mod_call},
-                 {:atom, _, caller}}, params, opts) do
-    opts = Map.update!(opts, :parents, &([:remote | &1]))
-    case half_clean_atom(mod_call) do
-      "erlang" -> {caller, [line: ln],  Translate.to_elixir(params, opts)}
-      "Kernel" -> {caller, [line: ln],  Translate.to_elixir(params, opts)}
-      c_mod_call -> get_caller(c_mod_call, ln, caller, params, opts)
-    end
-  end
-  def def_caller({:atom, ln, caller}, params, opts) do
-    opts = Map.update!(opts, :parents, &([:atom | &1]))
-    {caller, [line: ln], Translate.to_elixir(params, opts)}
-  end
-  def def_caller({:var, ln, caller}, params, opts) do
-    opts = Map.update!(opts, :parents, &([:var | &1]))
-    {{:., [line: ln],
-      [{clean_var(caller), [line: ln], nil}]},
-     [line: ln], Translate.to_elixir(params, opts)}
-  end
-
   def remove_tuples(l1) when is_list(l1) do
     Enum.map(l1, &remove_tuple/1)
   end
