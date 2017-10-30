@@ -3,8 +3,10 @@ defmodule BeamToExAst.Mixfile do
 
   def project do
     [app: :beam_to_ex_ast,
-     version: "0.0.1",
+     version: "0.3.0",
      elixir: "~> 1.1",
+     description: "Beam AST to Elixir AST transpiler",
+     package: package(),
      compilers: Mix.compilers ++ [:protocol_ex],
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
@@ -17,6 +19,15 @@ defmodule BeamToExAst.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger]]
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README*", "LICENSE*"],
+      maintainers: ["Olafur Arason"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/olafura/beam_to_ex_ast"}
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
@@ -33,6 +44,7 @@ defmodule BeamToExAst.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
+      {:ex_doc, "~> 0.16", only: :dev},
       {:protocol_ex, "~> 0.3.0"},
       {:forms, "~> 0.0.1"},
       {:dogma, "~> 0.0", only: :dev}

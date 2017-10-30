@@ -1,8 +1,15 @@
 /_build
-/cover
 /deps
+/doc
+/cover
 erl_crash.dump
 *.ez
+node_modules
+mix.lock
+profile/AllSets.json
+profile/AllSets-x.json
+profile/edg.json
+profile/usda.json
 
 # Vim
 *~
