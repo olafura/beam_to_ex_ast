@@ -3,7 +3,7 @@ defmodule BeamToExAst.Mixfile do
 
   def project do
     [app: :beam_to_ex_ast,
-     version: "0.3.0",
+     version: "0.3.1",
      elixir: "~> 1.1",
      description: "Beam AST to Elixir AST transpiler",
      package: package(),
@@ -45,7 +45,7 @@ defmodule BeamToExAst.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.16", only: :dev},
-      {:protocol_ex, "~> 0.3.0"},
+      {:protocol_ex, ">= 0.3.12"},
       {:forms, "~> 0.0.1"},
       {:dogma, "~> 0.0", only: :dev}
     ]
