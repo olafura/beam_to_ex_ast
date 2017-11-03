@@ -14,6 +14,9 @@ defimplEx BeamToExAst.Op2, {:op, _ln, _op, _param1, _param2}, for: Translate do
   import BeamToExAst
   alias BeamToExAst.Translate
 
+  def to_elixir({:op, ln, :!, p1, p2}, opts) do
+    {:send, [line: ln], [Translate.to_elixir(p1, opts), Translate.to_elixir(p2, opts)]}
+  end
   def to_elixir({:op, ln, op1, p1, p2}, opts) do
     opts = Map.update!(opts, :parents, &([:op | &1]))
     {clean_op(op1), [line: ln],
