@@ -33,7 +33,7 @@ defimplEx BeamToExAst.Remote, {:remote, _ln, _param1, _param2}, for: Translate d
                  {:atom, _, caller}}, %{parents: [:call | _]} = opts) do
     opts = Map.update!(opts, :parents, &([:remote | &1]))
     {params, opts} = Map.pop(opts, :call_params)
-    case half_clean_atom(mod_call) do
+    case half_clean_atom(mod_call, opts) do
       "erlang" -> {caller, [line: ln],  Translate.to_elixir(params, opts)}
       "Kernel" -> {caller, [line: ln],  Translate.to_elixir(params, opts)}
       c_mod_call -> get_caller(c_mod_call, ln, caller, params, opts)
