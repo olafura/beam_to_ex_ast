@@ -2,7 +2,6 @@ import ProtocolEx
 alias BeamToExAst.Translate
 
 defimplEx BeamToExAst.Atom, {:atom, _ln, _a1} , for: Translate do
-  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:atom, ln, caller}, %{parents: [:call | _]} = opts) do

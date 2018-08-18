@@ -23,10 +23,10 @@ defmodule BeamToExAst do
   def do_convert({:attribute, _ln, :module, name}, {_, rest, opts}) do
    {clean_module(name), rest, opts}
   end
-  def do_convert({:attribute, _ln, :record, ast}, {mod_name, rest, opts}) do
+  def do_convert({:attribute, _ln, :record, _ast}, {mod_name, rest, opts}) do
     {mod_name, rest, opts}
   end
-  def do_convert({:attribute, _, _, _} = ast, acc) do
+  def do_convert({:attribute, _, _, _}, acc) do
     acc
   end
   def do_convert({:function, _, :__info__, _, _}, acc) do

@@ -2,7 +2,6 @@ import ProtocolEx
 alias BeamToExAst.Translate
 
 defimplEx BeamToExAst.Bc, {:bc, _ln, _param1, _param2}, for: Translate do
-  import BeamToExAst
   alias BeamToExAst.Translate
 
   defp uncase(param, opts) when is_list(param) and length(param) == 1 do

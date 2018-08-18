@@ -14,11 +14,11 @@ defmodule TestFunctionCase do
         IO.puts(msg)
         Enum.filter([1, 2, 3, 4], fn
             (x) when x < 3 ->rem(x, 2) == 0
-            (x) -> true
+            (_x) -> true
         end)
     end
 
-    def hello(msg) do
+    def hello2(msg) do
         IO.puts(msg)
         case {1, 2} do
           {i1, i2} when is_integer(i1) and is_integer(i2) ->
@@ -29,8 +29,10 @@ defmodule TestFunctionCase do
         end
     end
 
-    def hello(l1) when is_list(l1) do
-       Enum.filter_map(l1, fn(x) -> rem(x, 2) == 0 end, &(&1 * 2)) 
+    def hello3(l1) when is_list(l1) do
+       l1
+       |> Enum.filter(fn(x) -> rem(x, 2) == 0 end)
+       |> Enum.map(&(&1 * 2))
     end
 
     def convert_param({:cons, _ln, c1, c2}) do

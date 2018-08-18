@@ -2,7 +2,6 @@ import ProtocolEx
 alias BeamToExAst.Translate
 
 defimplEx BeamToExAst.BGenerate, {:b_generate, _ln, _param1, _param2}, for: Translate do
-  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:b_generate, ln, {:bin, ln2, [bin]}, param2}, opts) do
