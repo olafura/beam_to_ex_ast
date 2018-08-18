@@ -47,7 +47,7 @@ defmodule BeamToExAst.Mixfile do
       {:ex_doc, "~> 0.16", only: :dev},
       {:protocol_ex, ">= 0.3.12"},
       {:forms, "~> 0.0.1"},
-      {:dogma, "~> 0.0", only: :dev}
+      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
     ]
   end
 end
