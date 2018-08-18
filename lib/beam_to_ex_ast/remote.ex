@@ -10,7 +10,7 @@ defimplEx BeamToExAst.Remote, {:remote, _ln, _param1, _param2}, for: Translate d
     opts = Map.update!(opts, :parents, &([:remote | &1]))
     {params, opts} = Map.pop(opts, :call_params)
     {{:., [line: ln],
-      [{:__aliases__, [counter: 0, line: ln2],[:Atom]}, :to_string]},
+      [{:__aliases__, [line: ln2], [:Atom]}, :to_string]},
      [line: ln2], List.delete_at(Translate.to_elixir(params, opts), -1)}
   end
   def to_elixir({:remote, ln, {:atom, _ln, :erlang},
@@ -18,7 +18,7 @@ defimplEx BeamToExAst.Remote, {:remote, _ln, _param1, _param2}, for: Translate d
     opts = Map.update!(opts, :parents, &([:remote | &1]))
     {params, opts} = Map.pop(opts, :call_params)
     {{:., [line: ln],
-      [{:__aliases__, [counter: 0, line: ln2], [:String]}, :to_atom]},
+      [{:__aliases__, [line: ln2], [:String]}, :to_atom]},
      [line: ln2], List.delete_at(Translate.to_elixir(params, opts), -1)}
   end
   def to_elixir({:remote, ln, {:atom, _ln, :erlang},

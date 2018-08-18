@@ -24,7 +24,7 @@ defmodule BeamToExAstTest do
       {:hello, [line: 2], []},
       [do: {{:.,
              [line: 3],
-             [{:__aliases__, [counter: 0, line: 3], [:IO]}, :puts]},
+             [{:__aliases__, [line: 3], [:IO]}, :puts]},
             [line: 3], ["Hello world"]
       }]
     ]}

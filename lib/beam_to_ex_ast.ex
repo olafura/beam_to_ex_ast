@@ -6,10 +6,10 @@ defmodule BeamToExAst do
     {mod_name, rest, _opts} = Enum.reduce(list, {"", [], opts}, &do_convert/2)
     case length(rest) do
       1 -> {:defmodule, [line: 1],
-            [{:__aliases__, [counter: 0, line: 1], [mod_name]},
+            [{:__aliases__, [line: 1], [mod_name]},
             [do: List.first(rest)]]}
       _ -> {:defmodule, [line: 1],
-            [{:__aliases__, [counter: 0, line: 1], [mod_name]},
+            [{:__aliases__, [line: 1], [mod_name]},
             [do: {:__block__, [], Enum.sort(rest, &sort_fun/2)}]]}
     end
   end
