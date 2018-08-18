@@ -2,16 +2,18 @@ defmodule BeamToExAst.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :beam_to_ex_ast,
-     version: "0.3.3",
-     elixir: "~> 1.1",
-     description: "Beam AST to Elixir AST transpiler",
-     package: package(),
-     compilers: Mix.compilers ++ [:protocol_ex],
-     elixirc_paths: elixirc_paths(Mix.env),
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :beam_to_ex_ast,
+      version: "0.3.3",
+      elixir: "~> 1.1",
+      description: "Beam AST to Elixir AST transpiler",
+      package: package(),
+      compilers: Mix.compilers() ++ [:protocol_ex],
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ]
   end
 
   # Configuration for the OTP application
@@ -31,7 +33,7 @@ defmodule BeamToExAst.Mixfile do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Dependencies can be Hex packages:
   #
@@ -47,7 +49,7 @@ defmodule BeamToExAst.Mixfile do
       {:ex_doc, "~> 0.16", only: :dev},
       {:protocol_ex, ">= 0.3.12"},
       {:forms, "~> 0.0.1"},
-      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
     ]
   end
 end

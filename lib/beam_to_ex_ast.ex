@@ -4,13 +4,17 @@ defmodule BeamToExAst do
   def convert(list, opts \\ []) do
     opts = Enum.into(opts, %{})
     {mod_name, rest, _opts} = Enum.reduce(list, {"", [], opts}, &do_convert/2)
+
     case length(rest) do
-      1 -> {:defmodule, [line: 1],
-            [{:__aliases__, [line: 1], [mod_name]},
-            [do: List.first(rest)]]}
-      _ -> {:defmodule, [line: 1],
-            [{:__aliases__, [line: 1], [mod_name]},
-            [do: {:__block__, [], Enum.sort(rest, &sort_fun/2)}]]}
+      1 ->
+        {:defmodule, [line: 1], [{:__aliases__, [line: 1], [mod_name]}, [do: List.first(rest)]]}
+
+      _ ->
+        {:defmodule, [line: 1],
+         [
+           {:__aliases__, [line: 1], [mod_name]},
+           [do: {:__block__, [], Enum.sort(rest, &sort_fun/2)}]
+         ]}
     end
   end
 
@@ -21,44 +25,65 @@ defmodule BeamToExAst do
   # _n is number of parameters
   # ln is the line number
   def do_convert({:attribute, _ln, :module, name}, {_, rest, opts}) do
-   {clean_module(name), rest, opts}
+    {clean_module(name), rest, opts}
   end
+
   def do_convert({:attribute, _ln, :record, _ast}, {mod_name, rest, opts}) do
     {mod_name, rest, opts}
   end
+
   def do_convert({:attribute, _, _, _}, acc) do
     acc
   end
+
   def do_convert({:function, _, :__info__, _, _}, acc) do
     acc
   end
+
   def do_convert({:function, _ln, name, _n, body}, {mod_name, rest, opts}) do
     opts = Map.put(opts, :parents, [:function])
-    {mod_name, Enum.concat(Enum.map(body, fn
-      {:clause, ln2, params, guard, body_def} ->
-        case guard do
-          [] ->
-            {:def,
-             [line: ln2],
-             [{name,
-               [line: ln2],
-               Translate.to_elixir(params, opts)
-              },
-              def_body(body_def, opts)
-             ]
-            }
-          [[g]] -> {:def, [line: ln2],
-                    [{:when, [line: ln2],
-                      [{name, [line: ln2], Translate.to_elixir(params, opts)},
-                        Translate.to_elixir(g, opts)]}, def_body(body_def, opts)]}
-          [g1, g2] -> {:def, [line: ln2],
-                        [{:when, [line: ln2],
-                          [{name, [line: ln2], Translate.to_elixir(params, opts)},
-                          {:and, [], [Translate.to_elixir(List.first(g1), opts), Translate.to_elixir(List.first(g2), opts)]}]}, def_body(body_def, opts)]}
 
-        end
-      _ -> body
-    end), rest), opts}
+    {mod_name,
+     Enum.concat(
+       Enum.map(body, fn
+         {:clause, ln2, params, guard, body_def} ->
+           case guard do
+             [] ->
+               {:def, [line: ln2],
+                [{name, [line: ln2], Translate.to_elixir(params, opts)}, def_body(body_def, opts)]}
+
+             [[g]] ->
+               {:def, [line: ln2],
+                [
+                  {:when, [line: ln2],
+                   [
+                     {name, [line: ln2], Translate.to_elixir(params, opts)},
+                     Translate.to_elixir(g, opts)
+                   ]},
+                  def_body(body_def, opts)
+                ]}
+
+             [g1, g2] ->
+               {:def, [line: ln2],
+                [
+                  {:when, [line: ln2],
+                   [
+                     {name, [line: ln2], Translate.to_elixir(params, opts)},
+                     {:and, [],
+                      [
+                        Translate.to_elixir(List.first(g1), opts),
+                        Translate.to_elixir(List.first(g2), opts)
+                      ]}
+                   ]},
+                  def_body(body_def, opts)
+                ]}
+           end
+
+         _ ->
+           body
+       end),
+       rest
+     ), opts}
   end
 
   def do_convert({:eof, _ln}, acc) do
@@ -66,12 +91,14 @@ defmodule BeamToExAst do
   end
 
   def def_body(items, opts) do
-    opts = Map.update!(opts, :parents, &([:body | &1]))
-    filtered_items = items
-    |> Enum.filter(fn
-      {:atom, _, nil} -> false
-      _ -> true
-    end)
+    opts = Map.update!(opts, :parents, &[:body | &1])
+
+    filtered_items =
+      items
+      |> Enum.filter(fn
+        {:atom, _, nil} -> false
+        _ -> true
+      end)
 
     case length(filtered_items) do
       1 -> [do: Translate.to_elixir(List.first(filtered_items), opts)]
@@ -80,7 +107,8 @@ defmodule BeamToExAst do
   end
 
   def def_body_less(items, opts) do
-    opts = Map.update!(opts, :parents, &([:body_less | &1]))
+    opts = Map.update!(opts, :parents, &[:body_less | &1])
+
     case length(items) do
       1 -> Translate.to_elixir(List.first(items), opts)
       _ -> {:__block__, [], Translate.to_elixir(items, opts)}
@@ -88,10 +116,13 @@ defmodule BeamToExAst do
   end
 
   def def_body_less_filter(items, opts) do
-    opts = Map.update!(opts, :parents, &([:body_less_filter | &1]))
-    items2 = items
-    |> Translate.to_elixir(opts)
-    |> Enum.filter(&filter_empty/1)
+    opts = Map.update!(opts, :parents, &[:body_less_filter | &1])
+
+    items2 =
+      items
+      |> Translate.to_elixir(opts)
+      |> Enum.filter(&filter_empty/1)
+
     case length(items2) do
       1 -> List.first(items2)
       _ -> {:__block__, [], items2}
@@ -100,13 +131,14 @@ defmodule BeamToExAst do
 
   def get_caller(c_mod_call, ln, caller, params, opts) do
     case String.match?(c_mod_call, ~r"^[A-Z]") do
-      true -> {{:., [line: ln],
-                [{:__aliases__, [line: ln],
-                 [String.to_atom(c_mod_call)]}, clean_atom(caller, opts)]},
-               [line: ln], Translate.to_elixir(params, opts)}
-      false -> {{:., [line: ln],
-                 [String.to_atom(c_mod_call), clean_atom(caller, opts)]},
-                [line: ln], Translate.to_elixir(params, opts)}
+      true ->
+        {{:., [line: ln],
+          [{:__aliases__, [line: ln], [String.to_atom(c_mod_call)]}, clean_atom(caller, opts)]},
+         [line: ln], Translate.to_elixir(params, opts)}
+
+      false ->
+        {{:., [line: ln], [String.to_atom(c_mod_call), clean_atom(caller, opts)]}, [line: ln],
+         Translate.to_elixir(params, opts)}
     end
   end
 
@@ -143,13 +175,15 @@ defmodule BeamToExAst do
 
   def check_params(params) do
     Enum.reduce(params, false, fn
-      ({:var, _ln, var}, acc) ->
+      {:var, _ln, var}, acc ->
         case Atom.to_string(var) do
-          <<"__@", _rest :: binary>> -> true
-          <<"_@", _rest :: binary>> -> true
+          <<"__@", _rest::binary>> -> true
+          <<"_@", _rest::binary>> -> true
           _ -> acc
         end
-      (_, acc) -> acc
+
+      _, acc ->
+        acc
     end)
   end
 
@@ -163,7 +197,7 @@ defmodule BeamToExAst do
 
   def clean_op(op1) do
     op1
-    |> Atom.to_string
+    |> Atom.to_string()
     |> case do
       "=:=" -> "==="
       "=/=" -> "!=="
@@ -172,13 +206,14 @@ defmodule BeamToExAst do
       "andalso" -> "and"
       s1 -> s1
     end
-    |> String.to_atom
+    |> String.to_atom()
   end
 
   def clean_module(a1) do
-    s1 = a1
-    |> Atom.to_string
-    |> String.replace("Elixir.", "")
+    s1 =
+      a1
+      |> Atom.to_string()
+      |> String.replace("Elixir.", "")
 
     s1
     |> String.match?(~r"^[A-Z]")
@@ -186,38 +221,40 @@ defmodule BeamToExAst do
       true -> s1
       false -> Macro.camelize(s1)
     end
-    |> String.to_atom
+    |> String.to_atom()
   end
 
   def clean_atom(a1, _) do
     a1
-    |> Atom.to_string
+    |> Atom.to_string()
     |> String.replace("Elixir.", "")
-    |> String.to_atom
+    |> String.to_atom()
   end
 
   def half_clean_atom(a1, _) do
     a1
-    |> Atom.to_string
+    |> Atom.to_string()
     |> String.replace("Elixir.", "")
   end
 
   def clean_var(v1, %{erlang: true}) do
     v1
-    |> Atom.to_string
+    |> Atom.to_string()
     |> Macro.underscore()
-    |> String.to_atom
+    |> String.to_atom()
   end
+
   def clean_var(v1, %{elixir: true}) do
     v1_string =
       v1
-      |> Atom.to_string
+      |> Atom.to_string()
 
     case System.version() do
-      <<"1.6", _rest :: binary>> ->
+      <<"1.6", _rest::binary>> ->
         v1_string
         |> String.replace(~r/^V/, "")
-      <<"1.7", _rest :: binary>> ->
+
+      <<"1.7", _rest::binary>> ->
         if Regex.match?(~r/@\d*/, v1_string) do
           v1_string
           |> String.replace(~r/^_/, "")
@@ -226,13 +263,14 @@ defmodule BeamToExAst do
         end
     end
     |> String.replace(~r/@\d*/, "")
-    |> String.to_atom
+    |> String.to_atom()
   end
+
   def clean_var(v1, _) do
     v1
-    |> Atom.to_string
+    |> Atom.to_string()
     |> String.replace(~r"@\d+", "")
-    |> String.to_atom
+    |> String.to_atom()
   end
 
   def filter_empty(:filter_this_thing_out_of_the_list_please) do
