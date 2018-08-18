@@ -15,7 +15,19 @@ defimplEx BeamToExAst.Var, {:var, _ln, _var}, for: Translate do
   def to_elixir({:var, ln, var}, opts) do
     case Atom.to_string(var) do
       <<"_@", rest :: binary>> ->
-        {:&, [line: ln], [String.to_integer(rest)]}
+        with {number, ""} <- Integer.parse(rest) do
+          {:&, [line: ln], [number]}
+        else
+          :error ->
+            {:&, [line: ln], [rest]}
+        end
+      <<"__@", rest :: binary>> ->
+        with {number, ""} <- Integer.parse(rest) do
+          {:&, [line: ln], [number]}
+        else
+          :error ->
+            {:&, [line: ln], [rest]}
+        end
       _ ->
         {clean_var(var, opts), [line: ln], nil}
     end

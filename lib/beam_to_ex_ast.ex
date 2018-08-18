@@ -145,6 +145,7 @@ defmodule BeamToExAst do
     Enum.reduce(params, false, fn
       ({:var, _ln, var}, acc) ->
         case Atom.to_string(var) do
+          <<"__@", _rest :: binary>> -> true
           <<"_@", _rest :: binary>> -> true
           _ -> acc
         end
@@ -208,9 +209,22 @@ defmodule BeamToExAst do
     |> String.to_atom
   end
   def clean_var(v1, %{elixir: true}) do
-    v1
-    |> Atom.to_string
-    |> String.replace(~r/^V/, "")
+    v1_string =
+      v1
+      |> Atom.to_string
+
+    case System.version() do
+      <<"1.6", _rest :: binary>> ->
+        v1_string
+        |> String.replace(~r/^V/, "")
+      <<"1.7", _rest :: binary>> ->
+        if Regex.match?(~r/@\d*/, v1_string) do
+          v1_string
+          |> String.replace(~r/^_/, "")
+        else
+          v1_string
+        end
+    end
     |> String.replace(~r/@\d*/, "")
     |> String.to_atom
   end
