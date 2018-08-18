@@ -28,7 +28,7 @@ defmodule BeamToExAstTest do
             [line: 3], ["Hello world"]
       }]
     ]}
-    res1 = BeamToExAst.do_convert(fun_beam, {"", []})
+    res1 = BeamToExAst.do_convert(fun_beam, {"", [], %{elixir: true}})
     assert List.first(elem(res1, 1)) == fun_ast
   end
 
@@ -39,7 +39,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "module function body" do
@@ -49,7 +49,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert clean_ast(BeamToExAst.convert(mod_beam)) == clean_ast(mod_ast)
+    assert clean_ast(BeamToExAst.convert(mod_beam, %{elixir: true})) == clean_ast(mod_ast)
   end
 
   test "module functions" do
@@ -59,7 +59,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "int" do
@@ -69,7 +69,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "float" do
@@ -79,7 +79,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "atom" do
@@ -89,7 +89,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "lists" do
@@ -101,7 +101,7 @@ defmodule BeamToExAstTest do
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     # IO.inspect(mod_beam)
     # IO.inspect(mod_ast)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "tuple" do
@@ -111,7 +111,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "map" do
@@ -121,7 +121,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "math" do
@@ -131,7 +131,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "bool compare" do
@@ -141,7 +141,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   test "case" do
@@ -152,7 +152,7 @@ defmodule BeamToExAstTest do
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     # IO.inspect(mod_beam)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
     # mod_ast2 = BeamToExAst.convert(mod_beam)
     # unless mod_ast2 == mod_ast do
     #   find_diff(mod_ast2, mod_ast)
@@ -166,7 +166,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert clean_ast(BeamToExAst.convert(mod_beam)) == clean_ast(mod_ast)
+    assert clean_ast(BeamToExAst.convert(mod_beam, %{elixir: true})) == clean_ast(mod_ast)
   end
 
   test "binary" do
@@ -176,7 +176,7 @@ defmodule BeamToExAstTest do
     {:ok,{_,[{:abstract_code,{_,mod_beam}}]}} =
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   @tag :wip
@@ -189,7 +189,7 @@ defmodule BeamToExAstTest do
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     # IO.inspect(mod_beam)
     # IO.inspect(mod_ast)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   @tag :wip
@@ -202,7 +202,7 @@ defmodule BeamToExAstTest do
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     # IO.inspect(mod_beam)
     # IO.inspect(mod_ast)
-    assert BeamToExAst.convert(mod_beam) == mod_ast
+    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
   end
 
   @tag :dogfood
@@ -215,7 +215,7 @@ defmodule BeamToExAstTest do
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     # IO.inspect(mod_beam)
     # IO.inspect(clean_ast(mod_ast))
-    assert clean_ast(BeamToExAst.convert(mod_beam)) == clean_ast(mod_ast)
+    assert clean_ast(BeamToExAst.convert(mod_beam, %{elixir: true})) == clean_ast(mod_ast)
     # mod_ast2 = BeamToExAst.convert(mod_beam)
     # unless mod_ast2 == clean_ast(mod_ast) do
     #   find_diff(mod_ast2, clean_ast(mod_ast))
