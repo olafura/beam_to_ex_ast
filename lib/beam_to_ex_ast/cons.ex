@@ -5,6 +5,9 @@ defimplEx BeamToExAst.Cons, {:cons, _ln, _param1, _param2}, for: Translate do
   import BeamToExAst
   alias BeamToExAst.Translate
 
+  defp get_line_number({atom, [line: ln], l1}) when is_atom(atom) and is_list(l1) do
+    ln
+  end
   defp get_line_number({atom, [line: ln], atom2}) when is_atom(atom) and is_atom(atom2) do
     ln
   end
