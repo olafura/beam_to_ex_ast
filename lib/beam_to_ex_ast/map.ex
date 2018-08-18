@@ -2,7 +2,6 @@ import ProtocolEx
 alias BeamToExAst.Translate
 
 defimplEx BeamToExAst.Map, {:map, _ln, _items}, for: Translate do
-  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:map, ln, items}, opts) do

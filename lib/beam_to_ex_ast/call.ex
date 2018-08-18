@@ -2,7 +2,6 @@ import ProtocolEx
 alias BeamToExAst.Translate
 
 defimplEx BeamToExAst.Call, {:call, _ln, _caller, _params}, for: Translate do
-  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:call, _ln, caller, params}, opts) do
