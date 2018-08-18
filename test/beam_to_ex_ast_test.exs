@@ -152,7 +152,7 @@ defmodule BeamToExAstTest do
       :beam_lib.chunks(beam_file, [:abstract_code])
     {:ok, mod_ast} = Code.string_to_quoted(file_content)
     # IO.inspect(mod_beam)
-    assert BeamToExAst.convert(mod_beam, %{elixir: true}) == mod_ast
+    assert clean_ast(BeamToExAst.convert(mod_beam, %{elixir: true})) == clean_ast(mod_ast)
     # mod_ast2 = BeamToExAst.convert(mod_beam)
     # unless mod_ast2 == mod_ast do
     #   find_diff(mod_ast2, mod_ast)
