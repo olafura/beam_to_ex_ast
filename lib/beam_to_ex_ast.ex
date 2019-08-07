@@ -254,7 +254,7 @@ defmodule BeamToExAst do
         v1_string
         |> String.replace(~r/^V/, "")
 
-      <<"1.7", _rest::binary>> ->
+      _ ->
         if Regex.match?(~r/@\d*/, v1_string) do
           v1_string
           |> String.replace(~r/^_/, "")
