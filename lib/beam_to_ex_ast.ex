@@ -22,6 +22,10 @@ defmodule BeamToExAst do
     lna < lnb
   end
 
+  def sort_fun(_, _) do
+    false
+  end
+
   # _n is number of parameters
   # ln is the line number
   def do_convert({:attribute, _ln, :module, name}, {_, rest, opts}) do
@@ -88,6 +92,19 @@ defmodule BeamToExAst do
 
   def do_convert({:eof, _ln}, acc) do
     acc
+  end
+
+  def do_convert(ast, {mod_name, rest, opts}) do
+    s1 =
+      :forms.from_abstract(ast)
+      |> List.to_string()
+
+    new_body = [
+      {:=, [], [{:_untranslated, [], nil}, s1]}
+      | rest
+    ]
+
+    {mod_name, new_body, opts}
   end
 
   def def_body(items, opts) do

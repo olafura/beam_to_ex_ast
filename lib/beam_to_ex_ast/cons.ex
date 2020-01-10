@@ -14,13 +14,15 @@ defimplEx BeamToExAst.Cons, {:cons, _ln, _param1, _param2}, for: Translate do
 
   defp get_line_number(other) do
     get_line_number(elem(other, 0))
+  rescue
+    _ -> 0
   end
 
   def to_elixir({:cons, _ln, c1, c2}, opts) do
     opts = Map.update!(opts, :parents, &[:cons | &1])
 
     case {Translate.to_elixir(c1, opts), Translate.to_elixir(c2, opts)} do
-      {cc1, cc2} when is_tuple(cc1) and is_tuple(cc2) ->
+      {cc1, cc2} when is_tuple(cc1) or is_tuple(cc2) ->
         ln2 =
           case Map.get(opts, :line) do
             nil ->
