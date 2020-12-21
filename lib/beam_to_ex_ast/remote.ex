@@ -51,4 +51,15 @@ defimplEx BeamToExAst.Remote, {:remote, _ln, _param1, _param2}, for: Translate d
       c_mod_call -> get_caller(c_mod_call, ln, caller, params, opts)
     end
   end
+
+  def to_elixir(
+    {:remote, meta, var = {:var, ln, _var}, {:atom, _, caller}},
+    %{parents: [:call | _]} = opts
+  ) do
+    opts = Map.update!(opts, :parents, &[:remote | &1])
+    {params, opts} = Map.pop(opts, :call_params)
+
+    {{:., [line: ln], [Translate.to_elixir(var, opts), clean_atom(caller, opts)]}, [line: ln],
+      Translate.to_elixir(params, opts)}
+  end
 end
