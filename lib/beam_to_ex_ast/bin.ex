@@ -1,7 +1,4 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.Bin, {:bin, _ln, _params}, for: Translate do
+defmodule BeamToExAst.Bin do
   import BeamToExAst
   alias BeamToExAst.Translate
 
@@ -14,7 +11,7 @@ defimplEx BeamToExAst.Bin, {:bin, _ln, _params}, for: Translate do
 
       bins ->
         case Enum.reduce(bins, false, &check_bins/2) do
-          true -> {:<<>>, [line: ln], bins}
+          true -> {:<<>>, [line: get_line(ln)], bins}
           false -> bins
         end
     end
@@ -38,12 +35,12 @@ defimplEx BeamToExAst.Bin, {:bin, _ln, _params}, for: Translate do
         bin
 
       bins when length(bins) === 2 ->
-        {:<>, [line: ln], bins}
+        {:<>, [line: get_line(ln)], bins}
 
       bins ->
         case Enum.reduce(bins, false, &check_bins/2) do
           true ->
-            {:<<>>, [line: ln], bins}
+            {:<<>>, [line: get_line(ln)], bins}
 
           false ->
             bins

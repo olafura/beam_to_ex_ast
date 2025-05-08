@@ -4,23 +4,17 @@ defmodule BeamToExAst.Mixfile do
   def project do
     [
       app: :beam_to_ex_ast,
-      version: "0.3.5",
+      version: "0.4.0",
       elixir: "~> 1.1",
       description: "Beam AST to Elixir AST transpiler",
       package: package(),
-      compilers: Mix.compilers() ++ [:protocol_ex],
+      compilers: Mix.compilers(),
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
+      extra_applications: [:logger],
       deps: deps()
     ]
-  end
-
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
-  def application do
-    [applications: [:logger]]
   end
 
   defp package do
@@ -46,10 +40,9 @@ defmodule BeamToExAst.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:ex_doc, "~> 0.16", only: :dev},
-      {:protocol_ex, ">= 0.3.12"},
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:forms, "~> 0.0.1"},
-      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 end

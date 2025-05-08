@@ -1,7 +1,4 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.String, {:string, _ln, _s1}, for: Translate do
+defmodule BeamToExAst.String do
   def to_elixir({:string, _ln, s1}, %{parents: [:bin_element | _]}) when is_list(s1) do
     List.to_string(s1)
   end

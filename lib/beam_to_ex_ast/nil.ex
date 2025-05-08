@@ -1,7 +1,4 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.Nil, {nil, _ln}, for: Translate do
+defmodule BeamToExAst.Nil do
   def to_elixir({nil, _ln}, _) do
     []
   end

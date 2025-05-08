@@ -1,7 +1,5 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.Match, {:match, _ln, _param1, _param2}, for: Translate do
+defmodule BeamToExAst.Match do
+  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:match, _ln, {:var, _, _}, {:atom, _, nil}}, _) do
@@ -14,6 +12,6 @@ defimplEx BeamToExAst.Match, {:match, _ln, _param1, _param2}, for: Translate do
 
   def to_elixir({:match, ln, m1, m2}, opts) do
     opts = Map.update!(opts, :parents, &[:match | &1])
-    {:=, [line: ln], [Translate.to_elixir(m1, opts), Translate.to_elixir(m2, opts)]}
+    {:=, [line: get_line(ln)], [Translate.to_elixir(m1, opts), Translate.to_elixir(m2, opts)]}
   end
 end

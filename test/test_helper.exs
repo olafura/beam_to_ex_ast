@@ -21,7 +21,7 @@ defmodule BeamToExAstTestUtils do
   end
 
   def find_diff([h1 | t1] = l1, [h2 | t2] = l2) when is_list(l1) and is_list(l2) do
-    unless l1 == l2 do
+    if l1 != l2 do
       IO.inspect("match1")
       IO.inspect(l1)
       IO.inspect(l2)
@@ -31,7 +31,7 @@ defmodule BeamToExAstTestUtils do
   end
 
   def find_diff({:do, {:__block__, _g1, l1}}, {:do, {:__block__, _g2, l2}}) do
-    unless l1 == l2 do
+    if l1 != l2 do
       IO.inspect("match2")
       IO.inspect(l1)
       IO.inspect(l2)
@@ -40,7 +40,7 @@ defmodule BeamToExAstTestUtils do
   end
 
   def find_diff([do: {:__block__, _g1, l1}], do: {:__block__, _g2, l2}) do
-    unless l1 == l2 do
+    if l1 != l2 do
       IO.inspect("match2")
       IO.inspect(l1)
       IO.inspect(l2)
@@ -49,7 +49,7 @@ defmodule BeamToExAstTestUtils do
   end
 
   def find_diff({:do, p1}, {:do, p2}) do
-    unless p1 == p2 do
+    if p1 != p2 do
       IO.inspect("match3")
       IO.inspect(p1)
       IO.inspect(p2)
@@ -57,7 +57,7 @@ defmodule BeamToExAstTestUtils do
   end
 
   def find_diff([do: p1], do: p2) do
-    unless p1 == p2 do
+    if p1 != p2 do
       IO.inspect("match3")
       IO.inspect(p1)
       IO.inspect(p2)
@@ -65,7 +65,7 @@ defmodule BeamToExAstTestUtils do
   end
 
   def find_diff({:defmodule, line, [_, l1]}, {:defmodule, line, [_, l2]}) do
-    unless l1 == l2 do
+    if l1 != l2 do
       IO.inspect("match4")
       IO.inspect(l1)
       IO.inspect(l2)
@@ -75,7 +75,7 @@ defmodule BeamToExAstTestUtils do
 
   def find_diff({a, line, [h1 | t1] = l1}, {a, line, [h2 | t2] = l2})
       when is_list(l1) and is_list(l2) do
-    unless l1 == l2 do
+    if l1 != l2 do
       IO.inspect("match5")
       IO.inspect(l1)
       IO.inspect(l2)

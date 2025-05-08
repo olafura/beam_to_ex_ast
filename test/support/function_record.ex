@@ -6,6 +6,6 @@ defmodule TestFunctionRecord do
 
   def hello() do
     u1 = user()
-    IO.puts("Hello " <> u1.name)
+    IO.puts("Hello " <> user(u1, :name))
   end
 end
