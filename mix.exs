@@ -21,7 +21,7 @@ defmodule BeamToExAst.Mixfile do
     [
       files: ["lib", "mix.exs", "README*", "LICENSE*"],
       maintainers: ["Olafur Arason"],
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/olafura/beam_to_ex_ast"}
     ]
   end
