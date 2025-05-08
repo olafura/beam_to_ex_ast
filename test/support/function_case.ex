@@ -38,6 +38,18 @@ defmodule TestFunctionCase do
     |> Enum.map(&(&1 * 2))
   end
 
+  def map_case(test) do
+    case test do
+      %{a: a} -> a
+      %{b: b} -> b
+    end
+  end
+
+  def test_map() do
+    test = %{a: 1}
+    map_case(test)
+  end
+
   def convert_param({:cons, _ln, c1, c2}) do
     case {convert_param(c1), convert_param(c2)} do
       {cc1, cc2} when is_tuple(cc1) and is_tuple(cc2) ->

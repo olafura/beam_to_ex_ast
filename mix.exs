@@ -4,7 +4,7 @@ defmodule BeamToExAst.Mixfile do
   def project do
     [
       app: :beam_to_ex_ast,
-      version: "0.4.0",
+      version: "0.4.1",
       elixir: "~> 1.1",
       description: "Beam AST to Elixir AST transpiler",
       package: package(),

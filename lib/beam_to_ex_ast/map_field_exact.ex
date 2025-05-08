@@ -1,6 +1,7 @@
 defmodule BeamToExAst.MapFieldExact do
-  # This is a performace enhancing feature in the compiled code
-  def to_elixir({:map_field_exact, _ln, _key, _val}, _) do
-    nil
+  alias BeamToExAst.Translate
+
+  def to_elixir({:map_field_exact, _ln, key, val}, opts) do
+    {Translate.to_elixir(key, opts), Translate.to_elixir(val, opts)}
   end
 end
