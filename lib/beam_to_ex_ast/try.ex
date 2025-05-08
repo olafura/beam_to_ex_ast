@@ -1,15 +1,11 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.Try,
-          {:try, _ln, _params, _else_params, _catch_rescue_params, _after_params},
-          for: Translate do
+defmodule BeamToExAst.Try do
+  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:try, ln, params, else_params, catch_rescue_params, after_params}, opts) do
     opts = Map.update!(opts, :parents, &[:try | &1])
 
-    {:try, [line: ln],
+    {:try, [line: get_line(ln)],
      [
        [
          do: Translate.to_elixir(params, opts),

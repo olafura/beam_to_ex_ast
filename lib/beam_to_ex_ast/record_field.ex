@@ -1,7 +1,4 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.RecordField, {:record_field, _ln, _param1, _param2}, for: Translate do
+defmodule BeamToExAst.RecordField do
   import BeamToExAst
   alias BeamToExAst.Translate
 

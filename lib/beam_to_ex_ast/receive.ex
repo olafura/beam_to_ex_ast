@@ -1,22 +1,21 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.Receive1, {:receive, _ln, _params}, for: Translate do
+defmodule BeamToExAst.Receive1 do
+  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:receive, ln, params}, opts) do
     opts = Map.update!(opts, :parents, &[:receive | &1])
-    {:receive, [line: ln], [[do: Translate.to_elixir(params, opts)]]}
+    {:receive, [line: get_line(ln)], [[do: Translate.to_elixir(params, opts)]]}
   end
 end
 
-defimplEx BeamToExAst.Receive2, {:receive, _ln, _params, _period, _after_body}, for: Translate do
+defmodule BeamToExAst.Receive2 do
+  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:receive, ln, params, period, after_body}, opts) do
     opts = Map.update!(opts, :parents, &[:receive | &1])
 
-    {:receive, [line: ln],
+    {:receive, [line: get_line(ln)],
      [
        [
          do: Translate.to_elixir(params, opts),

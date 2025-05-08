@@ -1,7 +1,4 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.List, params when is_list(params), for: Translate do
+defmodule BeamToExAst.List do
   alias BeamToExAst.Translate
 
   def to_elixir(params, opts) do

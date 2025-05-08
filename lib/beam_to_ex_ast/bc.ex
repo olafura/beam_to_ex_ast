@@ -1,7 +1,5 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.Bc, {:bc, _ln, _param1, _param2}, for: Translate do
+defmodule BeamToExAst.Bc do
+  import BeamToExAst
   alias BeamToExAst.Translate
 
   defp uncase(param, opts) when is_list(param) and length(param) == 1 do
@@ -15,7 +13,7 @@ defimplEx BeamToExAst.Bc, {:bc, _ln, _param1, _param2}, for: Translate do
   def to_elixir({:bc, ln, param1, param2}, opts) do
     opts = Map.update!(opts, :parents, &[:bc | &1])
 
-    {:for, [line: ln],
+    {:for, [line: get_line(ln)],
      uncase(param2, opts) ++ [[into: "", do: Translate.to_elixir(param1, opts)]]}
   end
 end

@@ -1,7 +1,4 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.Clause, {:clause, _ln, _params, _guard, _body}, for: Translate do
+defmodule BeamToExAst.Clause do
   import BeamToExAst
   alias BeamToExAst.Translate
 
@@ -12,14 +9,14 @@ defimplEx BeamToExAst.Clause, {:clause, _ln, _params, _guard, _body}, for: Trans
       false ->
         case guard do
           [] ->
-            {:->, [line: ln],
+            {:->, [line: get_line(ln)],
              [Translate.to_elixir(params, opts), def_body_less_filter(body, opts)]}
 
           [[g]] ->
-            {:->, [line: ln],
+            {:->, [line: get_line(ln)],
              [
                [
-                 {:when, [line: ln],
+                 {:when, [line: get_line(ln)],
                   [only_one(Translate.to_elixir(params, opts)), Translate.to_elixir(g, opts)]}
                ],
                def_body_less_filter(body, opts)
@@ -27,7 +24,7 @@ defimplEx BeamToExAst.Clause, {:clause, _ln, _params, _guard, _body}, for: Trans
         end
 
       true ->
-        {:&, [line: ln], [def_body_less_filter(body, opts)]}
+        {:&, [line: get_line(ln)], [def_body_less_filter(body, opts)]}
     end
   end
 end

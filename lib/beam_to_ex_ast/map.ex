@@ -1,7 +1,5 @@
-import ProtocolEx
-alias BeamToExAst.Translate
-
-defimplEx BeamToExAst.Map, {:map, _ln, _items}, for: Translate do
+defmodule BeamToExAst.Map do
+  import BeamToExAst
   alias BeamToExAst.Translate
 
   def to_elixir({:map, ln, items}, opts) do
@@ -15,10 +13,10 @@ defimplEx BeamToExAst.Map, {:map, _ln, _items}, for: Translate do
         re_version: _,
         source: b1
       ] ->
-        {:sigil_r, [line: ln2], [{:<<>>, [line: ln2], [b1]}, []]}
+        {:sigil_r, [line: get_line(ln)], [{:<<>>, [line: get_line(ln2)], [b1]}, []]}
 
       p1 ->
-        {:%{}, [line: ln], p1}
+        {:%{}, [line: get_line(ln)], p1}
     end
   end
 end

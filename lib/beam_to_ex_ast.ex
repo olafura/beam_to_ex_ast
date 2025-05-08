@@ -49,26 +49,29 @@ defmodule BeamToExAst do
          {:clause, ln2, params, guard, body_def} ->
            case guard do
              [] ->
-               {:def, [line: ln2],
-                [{name, [line: ln2], Translate.to_elixir(params, opts)}, def_body(body_def, opts)]}
+               {:def, [line: get_line(ln2)],
+                [
+                  {name, [line: get_line(ln2)], Translate.to_elixir(params, opts)},
+                  def_body(body_def, opts)
+                ]}
 
              [[g]] ->
-               {:def, [line: ln2],
+               {:def, [line: get_line(ln2)],
                 [
-                  {:when, [line: ln2],
+                  {:when, [line: get_line(ln2)],
                    [
-                     {name, [line: ln2], Translate.to_elixir(params, opts)},
+                     {name, [line: get_line(ln2)], Translate.to_elixir(params, opts)},
                      Translate.to_elixir(g, opts)
                    ]},
                   def_body(body_def, opts)
                 ]}
 
              [g1, g2] ->
-               {:def, [line: ln2],
+               {:def, [line: get_line(ln2)],
                 [
-                  {:when, [line: ln2],
+                  {:when, [line: get_line(ln2)],
                    [
-                     {name, [line: ln2], Translate.to_elixir(params, opts)},
+                     {name, [line: get_line(ln2)], Translate.to_elixir(params, opts)},
                      {:and, [],
                       [
                         Translate.to_elixir(List.first(g1), opts),
@@ -129,16 +132,21 @@ defmodule BeamToExAst do
     end
   end
 
+  def get_line({ln, _}), do: ln
+  def get_line(ln), do: ln
+
   def get_caller(c_mod_call, ln, caller, params, opts) do
     case String.match?(c_mod_call, ~r"^[A-Z]") do
       true ->
-        {{:., [line: ln],
-          [{:__aliases__, [line: ln], [String.to_atom(c_mod_call)]}, clean_atom(caller, opts)]},
-         [line: ln], Translate.to_elixir(params, opts)}
+        {{:., [line: get_line(ln)],
+          [
+            {:__aliases__, [line: get_line(ln)], [String.to_atom(c_mod_call)]},
+            clean_atom(caller, opts)
+          ]}, [line: get_line(ln)], Translate.to_elixir(params, opts)}
 
       false ->
-        {{:., [line: ln], [String.to_atom(c_mod_call), clean_atom(caller, opts)]}, [line: ln],
-         Translate.to_elixir(params, opts)}
+        {{:., [line: get_line(ln)], [String.to_atom(c_mod_call), clean_atom(caller, opts)]},
+         [line: get_line(ln)], Translate.to_elixir(params, opts)}
     end
   end
 
@@ -166,7 +174,7 @@ defmodule BeamToExAst do
   end
 
   def insert_line_number({:&, [line: 0], number}, ln) do
-    {:&, [line: ln], number}
+    {:&, [line: get_line(ln)], number}
   end
 
   def insert_line_number(var, _ln) do
@@ -179,6 +187,7 @@ defmodule BeamToExAst do
         case Atom.to_string(var) do
           <<"__@", _rest::binary>> -> true
           <<"_@", _rest::binary>> -> true
+          <<"_capture@", _rest::binary>> -> true
           _ -> acc
         end
 
